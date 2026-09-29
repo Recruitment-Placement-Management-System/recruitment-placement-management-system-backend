@@ -95,29 +95,43 @@ export class MongoUserRepository implements IUserRepository {
       throw new Error("Cannot update a user without an id");
     }
 
-    const document = await UserModel
-      .findByIdAndUpdate(
-        user.id,
-        {
+    const document = await UserModel.findByIdAndUpdate(
+      user.id,
+      {
+        $set:{
           email: user.email,
-          passwordHash: user.passwordHash,
-          roles: user.roles,
-          status: user.status,
-          isEmailVerified: user.isEmailVerified,
-          phone: user.phone,
-          refreshTokenHash: user.refreshTokenHash,
+        passwordHash: user.passwordHash,
+        roles: user.roles,
+        status: user.status,
+        isEmailVerified: user.isEmailVerified,
+        ...(user.phone !== undefined && {phone:user.phone}),
+        ...(user.refreshTokenHash !== undefined && {
+          refreshTokenHash:user.refreshTokenHash,
+        }),
+        ...(user.lastLoginAt !== undefined && {
           lastLoginAt: user.lastLoginAt,
-          emailVerificationCodeHash: user.emailVerificationCodeHash,
-          emailVerificationExpiresAt: user.emailVerificationExpiresAt,
+        }),
+        ...(user.passwordResetTokenHash !== undefined && {
           passwordResetTokenHash: user.passwordResetTokenHash,
+        }),
+        ...(user.passwordResetExpiresAt !== undefined && {
           passwordResetExpiresAt: user.passwordResetExpiresAt,
+        }),
         },
-        {
-          new: true,
-          runValidators: true,
-        },
-      )
-      .exec();
+        $unset:{
+          ...(user.emailVerificationCodeHash === undefined && {
+            emailVerificationCodeHash:1,
+          }),
+          ...(user.emailVerificationExpiresAt === undefined && {
+            emailVerificationExpiresAt:1,
+          })
+        }
+      },
+      {
+        new:true,
+        runValidators:true
+      },
+    ).exec()
 
     if (!document) {
       throw new Error("User not found");

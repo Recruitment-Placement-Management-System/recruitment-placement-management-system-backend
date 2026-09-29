@@ -1,3 +1,5 @@
+import { AppError } from "../../../shared/errors/app-error.js";
+
 import  { User } from "../../../domain/entities/user.entity.js";
 import { generateVerificationCode } from "../../../shared/utils/generate-verification-code.js";
 
@@ -21,7 +23,11 @@ export class RegisterCandidateUseCase{
         const existingUser = await this.userRepository.findByEmail(input.email,);
 
         if(existingUser){
-            throw new Error('Email is already registered')
+            throw new AppError(
+                409,
+                'Email is already registered',
+                'EMAIL_ALREADY_REGISTERED',
+            )
         }
 
         const passwordHash = await this.passwordService.hash(input.password);

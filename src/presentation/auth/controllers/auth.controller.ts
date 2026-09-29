@@ -1,5 +1,6 @@
 import type { NextFunction,Request,Response } from "express";
 import { registerCandidateUseCase } from "../../../DI/container.js";
+import {verifyEmailUseCase} from '../../../DI/container.js'
 
 export const registerCandidate = async(
     req:Request,
@@ -22,6 +23,22 @@ export const registerCandidate = async(
             },
         })
     }catch(error:unknown){
+        next(error)
+    }
+}
+
+export const verifyEmail = async(
+    req:Request,
+    res:Response,
+    next:NextFunction,
+):Promise<void>=>{
+    try{
+        await verifyEmailUseCase.execute(req.body)
+
+        res.status(200).json({
+            message:'Email verified successfully',
+        })
+    }catch(error){
         next(error)
     }
 }
