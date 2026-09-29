@@ -19,6 +19,7 @@ export class MongoUserRepository implements IUserRepository {
       document.lastLoginAt,
       document.emailVerificationCodeHash,
       document.emailVerificationExpiresAt,
+      document.emailVerificationLastSentAt,
       document.passwordResetTokenHash,
       document.passwordResetExpiresAt,
       document.createdAt,
@@ -78,6 +79,10 @@ export class MongoUserRepository implements IUserRepository {
       emailVerificationExpiresAt: user.emailVerificationExpiresAt,
     }),
 
+    ...(user.emailVerificationLastSentAt !== undefined && {
+      emailVerificationLastSentAt: user.emailVerificationLastSentAt,
+    }),
+
     ...(user.passwordResetTokenHash !== undefined && {
       passwordResetTokenHash: user.passwordResetTokenHash,
     }),
@@ -117,6 +122,17 @@ export class MongoUserRepository implements IUserRepository {
         ...(user.passwordResetExpiresAt !== undefined && {
           passwordResetExpiresAt: user.passwordResetExpiresAt,
         }),
+        ...(user.emailVerificationCodeHash !== undefined && {
+      emailVerificationCodeHash: user.emailVerificationCodeHash,
+    }),
+
+    ...(user.emailVerificationExpiresAt !== undefined && {
+      emailVerificationExpiresAt: user.emailVerificationExpiresAt,
+    }),
+
+    ...(user.emailVerificationLastSentAt !== undefined && {
+      emailVerificationLastSentAt: user.emailVerificationLastSentAt,
+    }),
         },
         $unset:{
           ...(user.emailVerificationCodeHash === undefined && {
@@ -124,7 +140,10 @@ export class MongoUserRepository implements IUserRepository {
           }),
           ...(user.emailVerificationExpiresAt === undefined && {
             emailVerificationExpiresAt:1,
-          })
+          }),
+            ...(user.emailVerificationLastSentAt === undefined && {
+              emailVerificationLastSentAt: 1,
+            }),
         }
       },
       {

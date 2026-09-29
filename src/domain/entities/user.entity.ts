@@ -19,6 +19,7 @@ export class User {
     public lastLoginAt?: Date,
     public emailVerificationCodeHash?: string,
     public emailVerificationExpiresAt?: Date,
+    public emailVerificationLastSentAt?:Date,
     public passwordResetTokenHash?: string,
     public passwordResetExpiresAt?: Date,
     public readonly createdAt: Date = new Date(),

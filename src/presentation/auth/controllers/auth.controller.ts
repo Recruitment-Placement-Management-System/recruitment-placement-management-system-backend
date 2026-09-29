@@ -1,6 +1,7 @@
 import type { NextFunction,Request,Response } from "express";
 import { registerCandidateUseCase } from "../../../DI/container.js";
 import {verifyEmailUseCase} from '../../../DI/container.js'
+import {resendVerificationEmailUseCase} from '../../../DI/container.js'
 
 export const registerCandidate = async(
     req:Request,
@@ -27,6 +28,7 @@ export const registerCandidate = async(
     }
 }
 
+
 export const verifyEmail = async(
     req:Request,
     res:Response,
@@ -38,6 +40,23 @@ export const verifyEmail = async(
         res.status(200).json({
             message:'Email verified successfully',
         })
+    }catch(error){
+        next(error)
+    }
+}
+
+
+export const  resendVerificatioEmail = async(
+    req:Request,
+    res:Response,
+    next:NextFunction,
+):Promise<void>=>{
+    try{
+        await resendVerificationEmailUseCase.execute(req.body)
+
+        res.status(200).json({
+            message:'"If the account requires email verification, a verification email has been sent.',
+        });
     }catch(error){
         next(error)
     }

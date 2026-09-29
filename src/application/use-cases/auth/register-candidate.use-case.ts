@@ -38,6 +38,8 @@ export class RegisterCandidateUseCase{
 
         const verificationExpiresAt = new Date(Date.now()+10*60*1000,)
 
+        const emailVerificationLastSentAt = new Date()
+
         const user = new User(
             undefined,
             input.email,
@@ -50,6 +52,7 @@ export class RegisterCandidateUseCase{
             undefined,
             verificationCodeHash,
             verificationExpiresAt,
+            emailVerificationLastSentAt,
         )
 
         const createdUser = await this.userRepository.create(user)

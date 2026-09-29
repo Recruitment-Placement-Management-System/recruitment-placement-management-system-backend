@@ -59,8 +59,10 @@ export class VerifyEmailUseCase{
 
         user.isEmailVerified = true;
         user.status = 'active';
+
         user.emailVerificationCodeHash = undefined;
         user.emailVerificationExpiresAt = undefined;
+        user.emailVerificationLastSentAt = undefined;
 
         await this.userRepository.update(user)
     }

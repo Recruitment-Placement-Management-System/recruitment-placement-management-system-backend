@@ -21,6 +21,8 @@ export interface UserDocument extends Document{
   passwordResetTokenHash?: string;
   passwordResetExpiresAt?: Date;
 
+  emailVerificationLastSentAt?: Date;
+
   settings?: Record<string, unknown>;
 
   createdAt: Date;
@@ -98,6 +100,10 @@ const userSchema = new Schema<UserDocument>(
     },
 
     passwordResetExpiresAt: {
+      type: Date,
+    },
+
+    emailVerificationLastSentAt: {
       type: Date,
     },
 
