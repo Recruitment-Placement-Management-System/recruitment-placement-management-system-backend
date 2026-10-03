@@ -18,13 +18,13 @@ const envSchema = z.object({
     .string()
     .min(1, "JWT_REFRESH_SECRET is required"),
 
-  RESEND_API_KEY: z
-  .string()
-  .min(1,'RESEND_API_KEY is required'),
+    SMTP_USER: z
+    .string()
+    .email("SMTP_USER must be a valid email"),
 
-  EMAIL_FROM: z
-  .string()
-  .email('EMAIL_FROM must be a valid email')
+  SMTP_APP_PASSWORD: z
+    .string()
+    .min(1, "SMTP_APP_PASSWORD is required"),
   
 })
 

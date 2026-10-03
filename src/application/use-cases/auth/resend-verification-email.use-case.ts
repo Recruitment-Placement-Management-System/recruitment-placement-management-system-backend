@@ -38,7 +38,7 @@ export class ResendVerificationEmailUseCase {
         user.emailVerificationExpiresAt = verificationExpiresAt;
         user.emailVerificationLastSentAt = new Date();
 
-        await this.userRepository.update(user)
+        await this.userRepository.update(user);
 
         await this.emailService.sendVerificationEmail(input.email,verificationCode)
     }

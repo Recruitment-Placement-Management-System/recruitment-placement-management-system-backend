@@ -20,3 +20,14 @@ export const verifyEmailSchema = z.object({
 export const resendVerificationEmailSchema = z.object({
     email:z.string().trim().email('Invalid email address')
 })
+
+export const registerRecruiterSchema = z.object({
+  fullName: z.string().trim().min(2, "Full name is required"),
+  phone: z.string().trim().min(10, "Invalid phone number"),
+  email: z.string().trim().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  designation: z.string().trim().min(2, "Designation is required"),
+  companyName: z.string().trim().min(2, "Company name is required"),
+  companyLocation: z.string().trim().min(2, "Company location is required"),
+  companyWebsite: z.string().trim().url("Invalid company website"),
+});

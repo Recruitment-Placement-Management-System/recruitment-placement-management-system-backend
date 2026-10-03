@@ -2,6 +2,7 @@ import type { NextFunction,Request,Response } from "express";
 import { registerCandidateUseCase } from "../../../DI/container.js";
 import {verifyEmailUseCase} from '../../../DI/container.js'
 import {resendVerificationEmailUseCase} from '../../../DI/container.js'
+import {registerRecruiterUseCase} from '../../../DI/container.js'
 
 export const registerCandidate = async(
     req:Request,
@@ -58,6 +59,24 @@ export const  resendVerificatioEmail = async(
             message:'"If the account requires email verification, a verification email has been sent.',
         });
     }catch(error){
+        next(error)
+    }
+}
+
+
+export const registerRecruiter = async(
+    req:Request,
+    res:Response,
+    next:NextFunction,
+):Promise<void>=>{
+    try{
+        const recruiter = await registerRecruiterUseCase.execute(req.body);
+
+        res.status(201).json({
+            message:'Recruiter registered successfully. Please verify your email',
+            userId:recruiter.id,
+        });
+    }catch(error:unknown){
         next(error)
     }
 }
