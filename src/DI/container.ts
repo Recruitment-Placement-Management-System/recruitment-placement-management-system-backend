@@ -2,6 +2,7 @@ import { RegisterCandidateUseCase } from '../application/use-cases/auth/register
 import { VerifyEmailUseCase } from '../application/use-cases/auth/verify-email.use-case.js';
 import { ResendVerificationEmailUseCase } from '../application/use-cases/auth/resend-verification-email.use-case.js';
 import { RegisterRecruiterUseCase } from '../application/use-cases/auth/register-recruiter.use-case.js';
+import { LoginUseCase } from '../application/use-cases/auth/login.use-case.js';
 
 import { MongoUserRepository } from "../infrastructure/repositories/mongo-user.repository.js";
 import { Argon2PasswordService } from "../infrastructure/services/argon2-password.service.js";
@@ -9,6 +10,8 @@ import { NodemailerEmailService } from '../infrastructure/services/nodemailer-em
 import { MongoCompanyRepository } from '../infrastructure/repositories/mongo-company.repository.js';
 import { MongoRecruiterProfileRepository } from '../infrastructure/repositories/mongo-recruiter-profile.repository.js';
 import { MongoVerificationRequestRepository } from '../infrastructure/repositories/mongo-verification-request.repository.js';
+import { ExpressAuthCookieService } from '../infrastructure/services/auth-cookie.service.js';
+import { JwtTokenService } from '../infrastructure/services/jwt-token.service.js';
 
 const userRepository = new MongoUserRepository();
 const passwordService = new Argon2PasswordService();
@@ -16,6 +19,8 @@ const emailService = new NodemailerEmailService();
 const companyRepository = new MongoCompanyRepository();
 const recruiterProfileRepository = new MongoRecruiterProfileRepository();
 const verificationRequestRepository = new MongoVerificationRequestRepository()
+const tokenService = new JwtTokenService()
+export const authCookieService = new ExpressAuthCookieService()
 
 export const registerCandidateUseCase = new RegisterCandidateUseCase(
     userRepository,
@@ -42,3 +47,9 @@ export const registerRecruiterUseCase = new RegisterRecruiterUseCase(
   passwordService,
   emailService,
 );
+
+export const loginUseCase = new LoginUseCase(
+  userRepository,
+  passwordService,
+  tokenService
+)

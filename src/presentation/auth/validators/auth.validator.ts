@@ -15,11 +15,11 @@ export const verifyEmailSchema = z.object({
     .trim()
     .length(6,'Verification code must be 6 digits')
     .regex(/^\d+$/, "Verification code must contain only digits")
-})
+});
 
 export const resendVerificationEmailSchema = z.object({
     email:z.string().trim().email('Invalid email address')
-})
+});
 
 export const registerRecruiterSchema = z.object({
   fullName: z.string().trim().min(2, "Full name is required"),
@@ -30,4 +30,9 @@ export const registerRecruiterSchema = z.object({
   companyName: z.string().trim().min(2, "Company name is required"),
   companyLocation: z.string().trim().min(2, "Company location is required"),
   companyWebsite: z.string().trim().url("Invalid company website"),
+});
+
+export const loginSchema = z.object({
+    email:z.string().trim().email('Invalid email address'),
+    password:z.string().min(1,'Password is required'),
 });

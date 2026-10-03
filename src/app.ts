@@ -18,12 +18,6 @@ app.use(pinoHttp({logger}))
 
 app.use('/api/auth',authRoutes)
 
-app.get('/health',(req,res)=>{
-    res.status(200).json({
-        success:true,
-        message:'R&PMS API is running',
-    })
-})
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware)

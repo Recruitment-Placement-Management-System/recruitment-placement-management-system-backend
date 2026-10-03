@@ -3,6 +3,7 @@ import { registerCandidateUseCase } from "../../../DI/container.js";
 import {verifyEmailUseCase} from '../../../DI/container.js'
 import {resendVerificationEmailUseCase} from '../../../DI/container.js'
 import {registerRecruiterUseCase} from '../../../DI/container.js'
+import { loginUseCase,authCookieService } from "../../../DI/container.js";
 
 export const registerCandidate = async(
     req:Request,
@@ -76,6 +77,27 @@ export const registerRecruiter = async(
             message:'Recruiter registered successfully. Please verify your email',
             userId:recruiter.id,
         });
+    }catch(error:unknown){
+        next(error)
+    }
+}
+
+
+export const login = async(
+    req:Request,
+    res:Response,
+    next:NextFunction,
+):Promise<void>=>{
+    try{
+        const result = await loginUseCase.execute(req.body);
+
+        authCookieService.setRefreshTokenCookie(res,result.refreshToken);
+
+        res.status(200).json({
+            message:'Login successful',
+            accessToken:result.accessToken,
+            user:result.user,
+        })
     }catch(error:unknown){
         next(error)
     }
