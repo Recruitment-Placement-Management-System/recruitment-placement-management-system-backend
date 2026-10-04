@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { registerCandidate,resendVerificatioEmail,verifyEmail,registerRecruiter,login,forgotPassword } from "../controllers/auth.controller.js";
+import { registerCandidate,resendVerificatioEmail,verifyEmail,registerRecruiter,login,forgotPassword,resetPassword } from "../controllers/auth.controller.js";
 import { validate } from "../middleware/validate.js";
 import { registerCandidateSchema,verifyEmailSchema,resendVerificationEmailSchema,
-    registerRecruiterSchema,loginSchema,forgotPasswordSchema } from "../validators/auth.validator.js";
+    registerRecruiterSchema,loginSchema,forgotPasswordSchema,resetPasswordSchema } from "../validators/auth.validator.js";
 
 const router = Router()
 
@@ -16,5 +16,6 @@ router.post('/register/recruiter',validate(registerRecruiterSchema),registerRecr
 router.post('/login',validate(loginSchema),login)
 
 router.post('/forgot-password',validate(forgotPasswordSchema),forgotPassword)
+router.post('/reset-password',validate(resetPasswordSchema),resetPassword)
 
 export default router;

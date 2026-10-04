@@ -41,3 +41,7 @@ export const forgotPasswordSchema = z.object({
     email:z.string().trim().email('Invalid email address'),
 })
 
+export const resetPasswordSchema = z.object({
+    token:z.string().trim().min(1,'Reset token is required'),
+    newPassword:z.string().min(8,"Password must be atleast 8 characters long"),
+})

@@ -5,6 +5,7 @@ import {resendVerificationEmailUseCase} from '../../../DI/container.js'
 import {registerRecruiterUseCase} from '../../../DI/container.js'
 import { loginUseCase,authCookieService } from "../../../DI/container.js";
 import { forgotPasswordUseCase } from "../../../DI/container.js";
+import { resetPasswordUseCase } from "../../../DI/container.js";
 
 export const registerCandidate = async(
     req:Request,
@@ -116,6 +117,21 @@ export const forgotPassword = async(
         res.status(200).json({
             message:'If an account with that email exist a password reset link has been sent'
         });
+    }catch(error:unknown){
+        next(error)
+    }
+}
+
+export const resetPassword = async(
+    req:Request,
+    res:Response,
+    next:NextFunction,
+):Promise<void>=>{
+    try{
+        await resetPasswordUseCase.execute(req.body)
+
+        res.status(200).json({message:"Password has been reset successfully"});
+        
     }catch(error:unknown){
         next(error)
     }

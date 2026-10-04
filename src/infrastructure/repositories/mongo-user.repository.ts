@@ -135,6 +135,12 @@ export class MongoUserRepository implements IUserRepository {
     }),
         },
         $unset:{
+          ...(user.passwordResetTokenHash === undefined && {
+            passwordResetTokenHash:1,
+          }),
+          ...(user.passwordResetExpiresAt === undefined && {
+            passwordResetExpiresAt:1,
+          }),
           ...(user.emailVerificationCodeHash === undefined && {
             emailVerificationCodeHash:1,
           }),
@@ -157,5 +163,16 @@ export class MongoUserRepository implements IUserRepository {
     }
 
     return this.toDomain(document);
+  }
+
+
+  async findByPasswordResetTokenHash(tokenHash: string): Promise<User | null> {
+    const userDocument = await UserModel.findOne({
+      passwordResetTokenHash:tokenHash
+    })
+
+    if(!userDocument)return null;
+
+    return this.toDomain(userDocument)
   }
 }

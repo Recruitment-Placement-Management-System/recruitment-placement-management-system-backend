@@ -1,14 +1,13 @@
 import { randomBytes } from "node:crypto";
 
-import { IUserRepository } from "../../interfaces/repositories/user.repository.js";
-import { IPasswordService } from "../../interfaces/services/password.service.js";
-import { IEmailService } from "../../interfaces/services/email.service.js";
-import { ForgotPasswordDTO } from "../../dto/auth/forgot-password.dto.js";
+import type { IUserRepository } from "../../interfaces/repositories/user.repository.js";
+import type { IEmailService } from "../../interfaces/services/email.service.js";
+import type { ForgotPasswordDTO } from "../../dto/auth/forgot-password.dto.js";
+import { hashResetToken } from "../../../shared/utils/hash-reset-token.js";
 
 export class ForgotPasswordUseCase{
     constructor(
         private readonly userRepository:IUserRepository,
-        private readonly passwordService:IPasswordService,
         private readonly emailService:IEmailService,
     ){}
 
@@ -19,7 +18,7 @@ export class ForgotPasswordUseCase{
 
         const resetToken = randomBytes(32).toString('hex');
 
-        user.passwordResetTokenHash = await this.passwordService.hash(resetToken);
+        user.passwordResetTokenHash = await hashResetToken(resetToken)
         user.passwordResetExpiresAt = new Date(Date.now()+15*60*1000);
         user.updatedAt = new Date();
 
