@@ -1,9 +1,10 @@
 import type { NextFunction,Request,Response } from "express";
-import { registerCandidateUseCase } from "../../../DI/container.js";
+import {  registerCandidateUseCase } from "../../../DI/container.js";
 import {verifyEmailUseCase} from '../../../DI/container.js'
 import {resendVerificationEmailUseCase} from '../../../DI/container.js'
 import {registerRecruiterUseCase} from '../../../DI/container.js'
 import { loginUseCase,authCookieService } from "../../../DI/container.js";
+import { forgotPasswordUseCase } from "../../../DI/container.js";
 
 export const registerCandidate = async(
     req:Request,
@@ -98,6 +99,23 @@ export const login = async(
             accessToken:result.accessToken,
             user:result.user,
         })
+    }catch(error:unknown){
+        next(error)
+    }
+}
+
+
+export const forgotPassword = async(
+    req:Request,
+    res:Response,
+    next:NextFunction,
+):Promise<void>=>{
+    try{
+        await forgotPasswordUseCase.execute(req.body)
+
+        res.status(200).json({
+            message:'If an account with that email exist a password reset link has been sent'
+        });
     }catch(error:unknown){
         next(error)
     }

@@ -5,6 +5,7 @@ import { render } from "@react-email/render";
 import type { IEmailService } from "../../application/interfaces/services/email.service.js";
 import { env } from "../../config/env.js";
 import { VerificationEmail } from "../email/templates/verification-email.js";
+import { PasswordResetEmail } from "../email/templates/password-reset.js";
 
 export class NodemailerEmailService implements IEmailService {
   private readonly transporter = nodemailer.createTransport({
@@ -35,8 +36,18 @@ export class NodemailerEmailService implements IEmailService {
     email: string,
     resetToken: string,
   ): Promise<void> {
-    // Implement when password reset is developed.
-    void email;
-    void resetToken;
+    const resetUrl = `http:localhost:5000/reset-password?token=${encodeURIComponent(resetToken)}`;
+
+    const html = await render(
+      PasswordResetEmail({resetUrl})
+    )
+
+    await this.transporter.sendMail({
+      from:`R&PMS <${env.SMTP_USER}>`,
+      to:email,
+      subject:"Reset your R&PMS password",
+      html,
+    })
+
   }
 }
