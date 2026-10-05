@@ -1,6 +1,6 @@
 import type { RequestHandler } from "express"
 import type { ZodType } from "zod"
-import { AppError } from "../../../shared/errors/app-error.js"
+import { AppError } from "../../shared/errors/app-error.js"
 
 export const validate = (schema:ZodType,):RequestHandler=>{
     return(req,_res,next)=>{

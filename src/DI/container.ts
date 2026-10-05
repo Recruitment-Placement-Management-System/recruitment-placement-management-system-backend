@@ -23,7 +23,7 @@ const emailService = new NodemailerEmailService();
 const companyRepository = new MongoCompanyRepository();
 const recruiterProfileRepository = new MongoRecruiterProfileRepository();
 const verificationRequestRepository = new MongoVerificationRequestRepository()
-const tokenService = new JwtTokenService()
+export const tokenService = new JwtTokenService()
 export const authCookieService = new ExpressAuthCookieService()
 
 export const registerCandidateUseCase = new RegisterCandidateUseCase(
