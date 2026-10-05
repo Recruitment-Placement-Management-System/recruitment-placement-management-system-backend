@@ -6,6 +6,7 @@ import {registerRecruiterUseCase} from '../../../DI/container.js'
 import { loginUseCase,authCookieService } from "../../../DI/container.js";
 import { forgotPasswordUseCase } from "../../../DI/container.js";
 import { resetPasswordUseCase } from "../../../DI/container.js";
+import { refreshAccessTokenUseCase } from "../../../DI/container.js";
 
 export const registerCandidate = async(
     req:Request,
@@ -132,6 +133,25 @@ export const resetPassword = async(
 
         res.status(200).json({message:"Password has been reset successfully"});
         
+    }catch(error:unknown){
+        next(error)
+    }
+}
+
+export const refreshAccessToken = async(
+    req:Request,
+    res:Response,
+    next:NextFunction,
+):Promise<void>=>{
+    try{
+        const refreshToken = req.cookies.refreshToken;
+
+        if(!refreshToken){
+            throw new Error("Refresh token not found");
+        }
+        const accessToken = await refreshAccessTokenUseCase.execute({refreshToken})
+
+        res.status(200).json({accessToken,})
     }catch(error:unknown){
         next(error)
     }

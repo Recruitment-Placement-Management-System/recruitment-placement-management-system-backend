@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerCandidate,resendVerificatioEmail,verifyEmail,registerRecruiter,login,forgotPassword,resetPassword } from "../controllers/auth.controller.js";
+import { registerCandidate,resendVerificatioEmail,verifyEmail,registerRecruiter,login,forgotPassword,resetPassword,refreshAccessToken } from "../controllers/auth.controller.js";
 import { validate } from "../middleware/validate.js";
 import { registerCandidateSchema,verifyEmailSchema,resendVerificationEmailSchema,
     registerRecruiterSchema,loginSchema,forgotPasswordSchema,resetPasswordSchema } from "../validators/auth.validator.js";
@@ -18,4 +18,5 @@ router.post('/login',validate(loginSchema),login)
 router.post('/forgot-password',validate(forgotPasswordSchema),forgotPassword)
 router.post('/reset-password',validate(resetPasswordSchema),resetPassword)
 
+router.post('/refresh-token',refreshAccessToken);
 export default router;
