@@ -10,18 +10,21 @@ const envSchema = z.object({
 
   MONGODB_URI: z.string().min(1, "MONGODB_URI is required"),
 
-  // JWT_ACCESS_SECRET: z
-  //   .string()
-  //   .min(1, "JWT_ACCESS_SECRET is required"),
+  JWT_ACCESS_SECRET: z
+    .string()
+    .min(1, "JWT_ACCESS_SECRET is required"),
 
-  // JWT_REFRESH_SECRET: z
-  //   .string()
-  //   .min(1, "JWT_REFRESH_SECRET is required"),
+  JWT_REFRESH_SECRET: z
+    .string()
+    .min(1, "JWT_REFRESH_SECRET is required"),
 
-  //    EMAIL_HOST: z.string().optional(),
-  // EMAIL_PORT: z.coerce.number().optional(),
-  // EMAIL_USER: z.string().optional(),
-  // EMAIL_PASSWORD: z.string().optional(),
+    SMTP_USER: z
+    .string()
+    .email("SMTP_USER must be a valid email"),
+
+  SMTP_APP_PASSWORD: z
+    .string()
+    .min(1, "SMTP_APP_PASSWORD is required"),
   
 })
 
