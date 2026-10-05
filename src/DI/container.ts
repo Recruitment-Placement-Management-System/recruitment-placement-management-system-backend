@@ -6,6 +6,7 @@ import { LoginUseCase } from '../application/use-cases/auth/login.use-case.js';
 import { ForgotPasswordUseCase } from '../application/use-cases/auth/forgot-password.use-case.js';
 import { ResetPasswordUseCase } from '../application/use-cases/auth/reset-password.use-case.js';
 import { RefreshAccessTokenUseCase } from '../application/use-cases/auth/refresh-access-token.use-case.js';
+import { LogoutUseCase } from '../application/use-cases/auth/logout.use-case.js';
 
 import { MongoUserRepository } from "../infrastructure/repositories/mongo-user.repository.js";
 import { Argon2PasswordService } from "../infrastructure/services/argon2-password.service.js";
@@ -29,7 +30,7 @@ export const registerCandidateUseCase = new RegisterCandidateUseCase(
     userRepository,
     passwordService,
     emailService,
-  );
+);
 
 export const verifyEmailUseCase = new VerifyEmailUseCase(
   userRepository,
@@ -55,20 +56,26 @@ export const loginUseCase = new LoginUseCase(
   userRepository,
   passwordService,
   tokenService
-)
+);
 
 export const forgotPasswordUseCase = new ForgotPasswordUseCase(
   userRepository,
   emailService
-)
+);
 
 export const resetPasswordUseCase = new ResetPasswordUseCase(
   userRepository,
   passwordService,
-)
+);
 
 export const refreshAccessTokenUseCase = new RefreshAccessTokenUseCase(
   userRepository,
   passwordService,
   tokenService,
-)
+);
+
+export const logoutUseCase = new LogoutUseCase(
+  userRepository,
+  passwordService,
+  tokenService,
+);

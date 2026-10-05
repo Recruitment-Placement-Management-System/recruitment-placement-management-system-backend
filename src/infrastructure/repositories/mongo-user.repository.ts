@@ -135,6 +135,9 @@ export class MongoUserRepository implements IUserRepository {
     }),
         },
         $unset:{
+          ...(user.refreshTokenHash === undefined && {
+            refreshTokenHash:1,
+          }),
           ...(user.passwordResetTokenHash === undefined && {
             passwordResetTokenHash:1,
           }),

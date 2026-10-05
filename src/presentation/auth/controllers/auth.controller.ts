@@ -7,6 +7,8 @@ import { loginUseCase,authCookieService } from "../../../DI/container.js";
 import { forgotPasswordUseCase } from "../../../DI/container.js";
 import { resetPasswordUseCase } from "../../../DI/container.js";
 import { refreshAccessTokenUseCase } from "../../../DI/container.js";
+import { logoutUseCase } from "../../../DI/container.js";
+import { AppError } from "../../../shared/errors/app-error.js";
 
 export const registerCandidate = async(
     req:Request,
@@ -153,6 +155,31 @@ export const refreshAccessToken = async(
 
         res.status(200).json({accessToken,})
     }catch(error:unknown){
+        next(error)
+    }
+}
+
+export const logout = async(
+    req:Request,
+    res:Response,
+    next:NextFunction,
+):Promise<void>=>{
+    try{
+       const refreshToken = req.cookies.refreshToken;
+
+       if(!refreshToken){
+        throw new AppError(401,'Refresh token not found');
+       }
+
+       await logoutUseCase.execute({refreshToken,});
+
+       authCookieService.clearRefreshTokenCookie(res);
+
+       res.status(200).json({
+        message:'logout successfull'
+       })
+    }
+    catch(error:unknown){
         next(error)
     }
 }
