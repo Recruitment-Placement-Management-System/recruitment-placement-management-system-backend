@@ -7,24 +7,36 @@ export const adminListUsers = async(
     next:NextFunction,
 ):Promise<void>=>{
     try{
-        const users = await listUsersUseCase.execute()
+        const page = Number(req.query.page ?? 1);
+        const limit = Number(req.query.limit ?? 10);
 
-        const safeUsers = users.map((user)=>({
-            id:user.id,
-            email:user.email,
-            roles:user.roles,
-            staus:user.status,
-            isEmailVerified:user.isEmailVerified,
-            phone:user.phone,
-            lastLoginAt:user.lastLoginAt,
-            createdAt:user.createdAt,
-            updatedAt:user.updatedAt,
+        const result = await listUsersUseCase.execute({
+            page,
+            limit,
+        });
+
+        const safeUsers = result.users.map((user)=>({
+            id: user.id,
+      email: user.email,
+      roles: user.roles,
+      status: user.status,
+      isEmailVerified: user.isEmailVerified,
+      phone: user.phone,
+      lastLoginAt: user.lastLoginAt,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
         }))
 
         res.status(200).json({
             message:'Users retrieved successfully',
-            safeUsers,
-        })
+            users:safeUsers,
+            pagination:{
+                total:result.total,
+                page:result.page,
+                limit:result.limit,
+                pages:result.pages,
+            },
+        });
     }catch(error:unknown){
         next(error)
     }

@@ -4,6 +4,8 @@ import {
   UserModel,
   type UserDocument,
 } from "../database/models/user.model.js";
+import type { UserQueryOptions,PaginatedUserResult } from "../../application/dto/admin/paginated-users.dto.js";
+import { getPagination } from "../../shared/utils/pagination.js";
 
 export class MongoUserRepository implements IUserRepository {
   private toDomain(document: UserDocument): User {
@@ -180,10 +182,24 @@ export class MongoUserRepository implements IUserRepository {
   }
 
 
-  
-  async findAll(): Promise<User[]> {
-    const documents = await UserModel.find().exec()
 
-    return documents.map((document)=>this.toDomain(document))
+
+
+  async findPaginated(options: UserQueryOptions): Promise<PaginatedUserResult<User>> {
+    const {page,limit} = options;
+    const {skip} = getPagination(page,limit);
+
+    const [documents,total] = await Promise.all([
+      UserModel.find().skip(skip).limit(limit).exec(),
+      UserModel.countDocuments().exec(),
+    ]);
+
+    return {
+      users:documents.map((document)=>this.toDomain(document)),
+      total,
+      page,
+      limit,
+      pages:Math.ceil(total/limit)
+    }
   }
 }
