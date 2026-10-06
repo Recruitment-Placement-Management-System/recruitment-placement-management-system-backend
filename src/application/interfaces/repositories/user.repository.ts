@@ -10,4 +10,6 @@ export interface IUserRepository{
     create(user:User):Promise<User>;
 
     update(user:User):Promise<User>
+
+    findAll():Promise<User[]>
 }

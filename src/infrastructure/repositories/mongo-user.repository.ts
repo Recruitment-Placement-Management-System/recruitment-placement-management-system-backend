@@ -178,4 +178,12 @@ export class MongoUserRepository implements IUserRepository {
 
     return this.toDomain(userDocument)
   }
+
+
+  
+  async findAll(): Promise<User[]> {
+    const documents = await UserModel.find().exec()
+
+    return documents.map((document)=>this.toDomain(document))
+  }
 }
