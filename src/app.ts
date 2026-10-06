@@ -9,6 +9,7 @@ import { errorMiddleware } from './presentation/middleware/error.middleware.js'
 import { notFoundMiddleware } from './presentation/middleware/not-found.middleware.js'
 
 import authRoutes from './presentation/auth/routes/auth.routes.js'
+import adminRoutes from './presentation/admin/routes/admin.routes.js'
 
 const app = express()
 
@@ -19,6 +20,7 @@ app.use(cookieParser())
 app.use(pinoHttp({logger}))
 
 app.use('/api/auth',authRoutes)
+app.use('/api/admin',adminRoutes)
 
 
 app.use(notFoundMiddleware);
