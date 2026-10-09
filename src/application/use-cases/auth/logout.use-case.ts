@@ -20,7 +20,7 @@ export class LogoutUseCase{
             throw new AppError(401,'Invalid refresh token')
         }
 
-        const isValid = this.passwordService.compare(input.refreshToken,user.refreshTokenHash);
+        const isValid = await this.passwordService.compare(input.refreshToken,user.refreshTokenHash);
 
         if(!isValid){
             throw new AppError(401,'Invalid refresh token')

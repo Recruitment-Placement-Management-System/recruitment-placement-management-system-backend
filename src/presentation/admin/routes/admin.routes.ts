@@ -12,4 +12,5 @@ router.post('/login',validate(adminLoginSchema),adminLogin)
 
 router.get('/users',authenticate,authorize("admin"),adminListUsers)
 
+
 export default router;

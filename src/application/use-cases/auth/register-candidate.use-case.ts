@@ -48,6 +48,7 @@ export class RegisterCandidateUseCase{
             'pending_verification',
             false,
             input.phone,
+            input.fullName,
             undefined,
             undefined,
             verificationCodeHash,

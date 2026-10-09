@@ -22,6 +22,7 @@ export const registerCandidate = async(
             message:'Registration successful. Please verify your email.',
             user:{
                 id:user.id,
+                fullName:user.fullName,
                 email:user.email,
                 roles:user.roles,
                 status:user.status,
@@ -151,9 +152,9 @@ export const refreshAccessToken = async(
         if(!refreshToken){
             throw new Error("Refresh token not found");
         }
-        const accessToken = await refreshAccessTokenUseCase.execute({refreshToken})
+        const result = await refreshAccessTokenUseCase.execute({refreshToken})
 
-        res.status(200).json({accessToken,})
+        res.status(200).json({accessToken: result.accessToken,user: result.user,})
     }catch(error:unknown){
         next(error)
     }

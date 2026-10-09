@@ -15,6 +15,7 @@ export class User {
     public status: UserStatus,
     public isEmailVerified: boolean,
     public phone?: string,
+    public fullName?:string,
     public refreshTokenHash?: string,
     public lastLoginAt?: Date,
     public emailVerificationCodeHash?: string,

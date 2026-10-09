@@ -52,6 +52,7 @@ export class RegisterRecruiterUseCase {
             input.phone,
             undefined,
             undefined,
+            undefined,
             verificationCodeHash,
             verificationExpiresAt,
             verificationLastSent,

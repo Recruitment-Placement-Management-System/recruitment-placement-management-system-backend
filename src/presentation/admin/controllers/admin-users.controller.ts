@@ -9,6 +9,7 @@ export const adminListUsers = async(
     try{
         const page = Number(req.query.page ?? 1);
         const limit = Number(req.query.limit ?? 10);
+        
 
         const result = await listUsersUseCase.execute({
             page,
@@ -17,6 +18,7 @@ export const adminListUsers = async(
 
         const safeUsers = result.users.map((user)=>({
             id: user.id,
+            fullName:user.fullName, 
       email: user.email,
       roles: user.roles,
       status: user.status,

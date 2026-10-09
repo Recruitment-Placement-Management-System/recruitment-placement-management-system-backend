@@ -17,6 +17,7 @@ export class MongoUserRepository implements IUserRepository {
       document.status,
       document.isEmailVerified,
       document.phone,
+      document.fullName,
       document.refreshTokenHash,
       document.lastLoginAt,
       document.emailVerificationCodeHash,
@@ -65,6 +66,10 @@ export class MongoUserRepository implements IUserRepository {
       phone: user.phone,
     }),
 
+    ...(user.fullName !== undefined && {
+  fullName: user.fullName,
+}),
+
     ...(user.refreshTokenHash !== undefined && {
       refreshTokenHash: user.refreshTokenHash,
     }),
@@ -112,6 +117,9 @@ export class MongoUserRepository implements IUserRepository {
         status: user.status,
         isEmailVerified: user.isEmailVerified,
         ...(user.phone !== undefined && {phone:user.phone}),
+        ...(user.fullName !== undefined && {
+  fullName: user.fullName,
+}),
         ...(user.refreshTokenHash !== undefined && {
           refreshTokenHash:user.refreshTokenHash,
         }),

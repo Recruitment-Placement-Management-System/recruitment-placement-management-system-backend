@@ -1,6 +1,8 @@
 import {z} from "zod";
 
 export const registerCandidateSchema = z.object({
+    fullName:z.string().trim().min(2,'Name must be atleast 2 characters'),
+    
     email:z.string().trim().email('Invalid email address'),
 
     password:z.string().min(8,'Password must be at least 8 characters'),

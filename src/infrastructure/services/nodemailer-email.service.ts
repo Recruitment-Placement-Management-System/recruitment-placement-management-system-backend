@@ -36,7 +36,7 @@ export class NodemailerEmailService implements IEmailService {
     email: string,
     resetToken: string,
   ): Promise<void> {
-    const resetUrl = `http:localhost:5000/reset-password?token=${encodeURIComponent(resetToken)}`;
+    const resetUrl = `http://localhost:5173/reset-password?token=${encodeURIComponent(resetToken)}`;
 
     const html = await render(
       PasswordResetEmail({resetUrl})

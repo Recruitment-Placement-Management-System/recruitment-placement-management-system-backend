@@ -10,6 +10,7 @@ export interface UserDocument extends Document{
     passwordHash:string;
     roles:UserRole[];
     phone?:string;
+    fullName?:string;
     status:UserStatus;
     isEmailVerified:boolean;
     refreshTokenHash?:string;
@@ -60,6 +61,12 @@ const userSchema = new Schema<UserDocument>(
       type: String,
       trim: true,
     },
+
+    fullName:{
+      type:String,
+      trim:true,
+    }
+    ,
 
     status: {
       type: String,
