@@ -14,7 +14,7 @@ export class JwtTokenService implements ITokenService{
         })
     }
 
-    genereateRefreshToken(payload: TokenPayload): string {
+    generateRefreshToken(payload: TokenPayload): string {
         return jwt.sign(payload,env.JWT_REFRESH_SECRET,{
             expiresIn:'7d'
         })

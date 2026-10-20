@@ -1,30 +1,9 @@
 import type { IRecruiterProfileRepository } from "../../application/interfaces/repositories/recruiter-profile.repository.js";
-import  { RecruiterProfile,RecruiterVerificationStatus } from "../../domain/entities/recruiter-profile.entity.js";
+import { RecruiterProfile } from "../../domain/entities/recruiter-profile.entity.js";
 import { RecruiterProfileModel } from "../database/models/recruiter-profile.model.js";
+import { RecruiterProfileMapper } from "../mappers/recruiter-profile.mapper.js";
 
 export class MongoRecruiterProfileRepository implements IRecruiterProfileRepository{
-  private toDomain(document:{
-    _id:unknown;
-    userId:unknown;
-    companyId:unknown;
-    fullName:string;
-    designation:string;
-    verificationStatus:RecruiterVerificationStatus;
-    createdAt:Date;
-    updatedAt:Date;
-  }):RecruiterProfile{
-    return new RecruiterProfile(
-      String(document._id),
-      String(document.userId),
-      String(document.companyId),
-      document.fullName,
-      document.designation,
-      document.verificationStatus,
-      document.createdAt,
-      document.updatedAt,
-    );
-  }
-
   async findByUserId(userId: string): Promise<RecruiterProfile | null> {
     const profile = await RecruiterProfileModel.findOne({
       userId,   
@@ -32,19 +11,13 @@ export class MongoRecruiterProfileRepository implements IRecruiterProfileReposit
 
     if(!profile)return null;
 
-    return this.toDomain(profile)
+    return RecruiterProfileMapper.toDomain(profile)
   }
 
   async create(profile: RecruiterProfile): Promise<RecruiterProfile> {
-    const createdProfile = await RecruiterProfileModel.create({
-      userId:profile.userId,
-      companyId:profile.companyId,
-      fullName:profile.fullName,
-      designation:profile.designation,
-      verificationStatus:profile.verificationStatus,
-    })
+    const createdProfile = await RecruiterProfileModel.create(RecruiterProfileMapper.toPersistence(profile))
 
-    return this.toDomain(createdProfile)
+    return RecruiterProfileMapper.toDomain(createdProfile)
   }
 
   async update(profile: RecruiterProfile): Promise<RecruiterProfile> {
@@ -52,11 +25,7 @@ export class MongoRecruiterProfileRepository implements IRecruiterProfileReposit
       profile.id,
       {
         $set:{
-          userId:profile.userId,
-          companyId:profile.companyId,
-          fullName:profile.fullName,
-          designation:profile.designation,
-          verificationStatus:profile.verificationStatus, 
+          ...RecruiterProfileMapper.toPersistence(profile),
         }
       },
       {
@@ -68,6 +37,6 @@ export class MongoRecruiterProfileRepository implements IRecruiterProfileReposit
     if(!updatedProfile){
       throw new Error('Recruiter profile not found')
     }
-    return this.toDomain(updatedProfile)
+    return RecruiterProfileMapper.toDomain(updatedProfile)
   }
 }

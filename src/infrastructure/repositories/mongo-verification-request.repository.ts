@@ -1,46 +1,10 @@
 import type { IVerificationRequestRepository } from "../../application/interfaces/repositories/verification-request.repository.js";
-import  { 
-  VerificationRequest,
-  VerificationEntityType,
-  VerificationPriority,
-  VerificationRequestStatus
- } from "../../domain/entities/verification-request.entity.js";
+import { VerificationRequest } from "../../domain/entities/verification-request.entity.js";
 
  import {  VerificationRequestModel } from "../database/models/verification-request.model.js";
+ import { VerificationRequestMapper } from "../mappers/verification-request.mapper.js";
 
 export class MongoVerificationRequestRepository implements IVerificationRequestRepository{
-  private toDomain(document:{
-    _id:unknown;
-    entityId:unknown;
-    entityType:VerificationEntityType;
-    submittedBy:unknown;
-    status:VerificationRequestStatus;
-    priority:VerificationPriority;
-    documents:string[];
-    adminNotes?:string;
-    reviewedBy?:unknown;
-    submittedAt:Date;
-    reviewedAt?:Date;
-    createdAt:Date;
-    updatedAt:Date;
-  }):VerificationRequest{
-    return new VerificationRequest(
-      String(document._id),
-      String(document.entityId),
-      document.entityType,
-      String(document.submittedBy),
-      document.status,
-      document.priority,
-      document.documents,
-      document.adminNotes,
-      document.reviewedBy?String(document.reviewedBy):undefined,
-      document.submittedAt,
-      document.reviewedAt,
-      document.createdAt,
-      document.updatedAt
-    )
-  }
-
   async findByEntity(entityId: string, entityType: "recruiter"): Promise<VerificationRequest | null> {
     const request = await VerificationRequestModel.findOne({
       entityId,
@@ -49,31 +13,16 @@ export class MongoVerificationRequestRepository implements IVerificationRequestR
 
     if(!request)return null ;
 
-    return this.toDomain(request);
+    return VerificationRequestMapper.toDomain(request);
   }
 
 
   async create(request: VerificationRequest): Promise<VerificationRequest> {
-    const createdRequest = await VerificationRequestModel.create({
-      entityId:request.entityId,
-      entityType:request.entityType,
-      submittedBy:request.submittedBy,
-      status:request.status,
-      priority:request.priority,
-      documents:request.documents,
-      submittedAt:request.submittedAt,
-      ...(request.adminNotes !== undefined && {
-        adminNotes:request.adminNotes,
-      }),
-      ...(request.reviewedBy !== undefined && {
-        reviewedBy:request.reviewedBy,
-      }),
-      ...(request.reviewedAt !== undefined && {
-        reviewedAt:request.reviewedAt,
-      }),
-    })
+    const createdRequest = await VerificationRequestModel.create(
+      VerificationRequestMapper.toPersistence(request),
+    )
 
-    return this.toDomain(createdRequest)
+    return VerificationRequestMapper.toDomain(createdRequest)
   }
 
   async update(
@@ -83,24 +32,7 @@ export class MongoVerificationRequestRepository implements IVerificationRequestR
     await VerificationRequestModel.findByIdAndUpdate(
       request.id,
       {
-        $set: {
-          entityId: request.entityId,
-          entityType: request.entityType,
-          submittedBy: request.submittedBy,
-          status: request.status,
-          priority: request.priority,
-          documents: request.documents,
-          submittedAt: request.submittedAt,
-          ...(request.reviewedBy !== undefined && {
-            reviewedBy: request.reviewedBy,
-          }),
-          ...(request.reviewedAt !== undefined && {
-            reviewedAt: request.reviewedAt,
-          }),
-          ...(request.adminNotes !== undefined && {
-            adminNotes: request.adminNotes,
-          }),
-        },
+        $set: VerificationRequestMapper.toPersistence(request),
       },
       {
         new: true,
@@ -112,6 +44,6 @@ export class MongoVerificationRequestRepository implements IVerificationRequestR
     throw new Error("Verification request not found");
   }
 
-  return this.toDomain(updatedRequest);
+  return VerificationRequestMapper.toDomain(updatedRequest);
 }
 }

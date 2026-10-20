@@ -7,6 +7,7 @@ import { ForgotPasswordUseCase } from '../application/use-cases/auth/forgot-pass
 import { ResetPasswordUseCase } from '../application/use-cases/auth/reset-password.use-case.js';
 import { RefreshAccessTokenUseCase } from '../application/use-cases/auth/refresh-access-token.use-case.js';
 import { LogoutUseCase } from '../application/use-cases/auth/logout.use-case.js';
+import { ListUsersUseCase } from '../application/use-cases/admin/list-users.use-case.js';
 
 import { MongoUserRepository } from "../infrastructure/repositories/mongo-user.repository.js";
 import { Argon2PasswordService } from "../infrastructure/services/argon2-password.service.js";
@@ -14,7 +15,6 @@ import { NodemailerEmailService } from '../infrastructure/services/nodemailer-em
 import { MongoCompanyRepository } from '../infrastructure/repositories/mongo-company.repository.js';
 import { MongoRecruiterProfileRepository } from '../infrastructure/repositories/mongo-recruiter-profile.repository.js';
 import { MongoVerificationRequestRepository } from '../infrastructure/repositories/mongo-verification-request.repository.js';
-import { ExpressAuthCookieService } from '../infrastructure/services/auth-cookie.service.js';
 import { JwtTokenService } from '../infrastructure/services/jwt-token.service.js';
 
 const userRepository = new MongoUserRepository();
@@ -24,7 +24,6 @@ const companyRepository = new MongoCompanyRepository();
 const recruiterProfileRepository = new MongoRecruiterProfileRepository();
 const verificationRequestRepository = new MongoVerificationRequestRepository()
 export const tokenService = new JwtTokenService()
-export const authCookieService = new ExpressAuthCookieService()
 
 export const registerCandidateUseCase = new RegisterCandidateUseCase(
     userRepository,
@@ -79,3 +78,18 @@ export const logoutUseCase = new LogoutUseCase(
   passwordService,
   tokenService,
 );
+
+export const authDependencies = {
+  registerCandidateUseCase,
+  verifyEmailUseCase,
+  resendVerificationEmailUseCase,
+  registerRecruiterUseCase,
+  loginUseCase,
+  forgotPasswordUseCase,
+  resetPasswordUseCase,
+  refreshAccessTokenUseCase,
+  logoutUseCase,
+};
+
+export const listUsersUseCase = new ListUsersUseCase(userRepository);
+export const adminDependencies = { loginUseCase, listUsersUseCase, tokenService };

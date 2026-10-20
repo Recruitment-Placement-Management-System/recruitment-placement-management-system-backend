@@ -1,5 +1,4 @@
 import type { User } from "../../../domain/entities/user.entity.js";
-import type { UserQueryOptions,PaginatedUserResult } from "../../dto/admin/paginated-users.dto.js";
 
 export interface IUserRepository{
     findById(id:string):Promise<User|null>;
@@ -12,5 +11,4 @@ export interface IUserRepository{
 
     update(user:User):Promise<User>
 
-    findPaginated(options:UserQueryOptions,):Promise<PaginatedUserResult<User>>
 }

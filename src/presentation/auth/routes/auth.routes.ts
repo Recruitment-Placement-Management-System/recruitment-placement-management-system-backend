@@ -1,25 +1,25 @@
 import { Router } from "express";
+import { createAuthController, type AuthControllerDependencies } from "../controllers/auth.controller.js";
 import { validate } from "../../middleware/validate.js";
-import { registerCandidate,resendVerificatioEmail,verifyEmail,registerRecruiter,login,forgotPassword,resetPassword,refreshAccessToken,logout } from "../controllers/auth.controller.js";
-import { registerCandidateSchema,verifyEmailSchema,resendVerificationEmailSchema,
-    registerRecruiterSchema,loginSchema,forgotPasswordSchema,resetPasswordSchema } from "../validators/auth.validator.js";
+import {
+  forgotPasswordSchema, loginSchema, registerCandidateSchema,
+  registerRecruiterSchema, resendVerificationEmailSchema,
+  resetPasswordSchema, verifyEmailSchema,
+} from "../validators/auth.validator.js";
 
-const router = Router()
+export const createAuthRouter = (dependencies: AuthControllerDependencies) => {
+  const router = Router();
+  const controller = createAuthController(dependencies);
 
-router.post('/register',validate(registerCandidateSchema),registerCandidate);
-router.post('/verify-email',validate(verifyEmailSchema),verifyEmail)
+  router.post("/register", validate(registerCandidateSchema), controller.registerCandidate);
+  router.post("/verify-email", validate(verifyEmailSchema), controller.verifyEmail);
+  router.post("/resend-verification", validate(resendVerificationEmailSchema), controller.resendVerificationEmail);
+  router.post("/register/recruiter", validate(registerRecruiterSchema), controller.registerRecruiter);
+  router.post("/login", validate(loginSchema), controller.login);
+  router.post("/forgot-password", validate(forgotPasswordSchema), controller.forgotPassword);
+  router.post("/reset-password", validate(resetPasswordSchema), controller.resetPassword);
+  router.post("/refresh-token", controller.refreshAccessToken);
+  router.post("/logout", controller.logout);
 
-router.post('/resend-verification',validate(resendVerificationEmailSchema),resendVerificatioEmail)
-
-router.post('/register/recruiter',validate(registerRecruiterSchema),registerRecruiter)
-
-router.post('/login',validate(loginSchema),login)
-
-router.post('/forgot-password',validate(forgotPasswordSchema),forgotPassword)
-router.post('/reset-password',validate(resetPasswordSchema),resetPassword)
-
-router.post('/refresh-token',refreshAccessToken);
-
-router.post('/logout',logout)
-
-export default router;
+  return router;
+};

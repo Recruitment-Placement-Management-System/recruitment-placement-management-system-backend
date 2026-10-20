@@ -1,4 +1,4 @@
-import { AppError } from "../../../shared/errors/app-error.js";
+import { AppError } from "../../errors/app-error.js";
 
 import type { IUserRepository } from "../../interfaces/repositories/user.repository.js";
 import type { IPasswordService } from "../../interfaces/services/password.service.js";
@@ -55,7 +55,7 @@ export class LoginUseCase{
 
     const accessToken = this.tokenService.generateAccessToken({userId:user.id,roles:user.roles})
 
-    const refreshToken = this.tokenService.genereateRefreshToken({userId:user.id,roles:user.roles})
+    const refreshToken = this.tokenService.generateRefreshToken({userId:user.id,roles:user.roles})
 
     user.refreshTokenHash = await this.passwordService.hash(refreshToken);
     user.lastLoginAt = new Date();

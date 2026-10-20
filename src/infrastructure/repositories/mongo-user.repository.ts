@@ -1,35 +1,14 @@
-import  { User } from "../../domain/entities/user.entity.js";
+import { User } from "../../domain/entities/user.entity.js";
 import type { IUserRepository } from "../../application/interfaces/repositories/user.repository.js";
+import type { IAdminUserQueryRepository } from "../../application/interfaces/repositories/admin-user-query.repository.js";
 import {
   UserModel,
-  type UserDocument,
 } from "../database/models/user.model.js";
 import type { UserQueryOptions,PaginatedUserResult } from "../../application/dto/admin/paginated-users.dto.js";
 import { getPagination } from "../../shared/utils/pagination.js";
+import { UserMapper } from "../mappers/user.mapper.js";
 
-export class MongoUserRepository implements IUserRepository {
-  private toDomain(document: UserDocument): User {
-    return new User(
-      document._id.toString(),
-      document.email,
-      document.passwordHash,
-      document.roles,
-      document.status,
-      document.isEmailVerified,
-      document.phone,
-      document.fullName,
-      document.refreshTokenHash,
-      document.lastLoginAt,
-      document.emailVerificationCodeHash,
-      document.emailVerificationExpiresAt,
-      document.emailVerificationLastSentAt,
-      document.passwordResetTokenHash,
-      document.passwordResetExpiresAt,
-      document.createdAt,
-      document.updatedAt,
-    );
-  }
-
+export class MongoUserRepository implements IUserRepository, IAdminUserQueryRepository {
   async findById(id: string): Promise<User | null> {
     const document = await UserModel.findById(id).exec();
 
@@ -37,7 +16,7 @@ export class MongoUserRepository implements IUserRepository {
       return null;
     }
 
-    return this.toDomain(document);
+    return UserMapper.toDomain(document);
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -51,55 +30,12 @@ export class MongoUserRepository implements IUserRepository {
       return null;
     }
 
-    return this.toDomain(document);
+    return UserMapper.toDomain(document);
   }
 
   async create(user: User): Promise<User> {
-  const document = await UserModel.create({
-    email: user.email,
-    passwordHash: user.passwordHash,
-    roles: user.roles,
-    status: user.status,
-    isEmailVerified: user.isEmailVerified,
-
-    ...(user.phone !== undefined && {
-      phone: user.phone,
-    }),
-
-    ...(user.fullName !== undefined && {
-  fullName: user.fullName,
-}),
-
-    ...(user.refreshTokenHash !== undefined && {
-      refreshTokenHash: user.refreshTokenHash,
-    }),
-
-    ...(user.lastLoginAt !== undefined && {
-      lastLoginAt: user.lastLoginAt,
-    }),
-
-    ...(user.emailVerificationCodeHash !== undefined && {
-      emailVerificationCodeHash: user.emailVerificationCodeHash,
-    }),
-
-    ...(user.emailVerificationExpiresAt !== undefined && {
-      emailVerificationExpiresAt: user.emailVerificationExpiresAt,
-    }),
-
-    ...(user.emailVerificationLastSentAt !== undefined && {
-      emailVerificationLastSentAt: user.emailVerificationLastSentAt,
-    }),
-
-    ...(user.passwordResetTokenHash !== undefined && {
-      passwordResetTokenHash: user.passwordResetTokenHash,
-    }),
-
-    ...(user.passwordResetExpiresAt !== undefined && {
-      passwordResetExpiresAt: user.passwordResetExpiresAt,
-    }),
-  });
-
-  return this.toDomain(document);
+    const document = await UserModel.create(UserMapper.toCreateData(user));
+    return UserMapper.toDomain(document);
 }
 
   async update(user: User): Promise<User> {
@@ -109,62 +45,7 @@ export class MongoUserRepository implements IUserRepository {
 
     const document = await UserModel.findByIdAndUpdate(
       user.id,
-      {
-        $set:{
-          email: user.email,
-        passwordHash: user.passwordHash,
-        roles: user.roles,
-        status: user.status,
-        isEmailVerified: user.isEmailVerified,
-        ...(user.phone !== undefined && {phone:user.phone}),
-        ...(user.fullName !== undefined && {
-  fullName: user.fullName,
-}),
-        ...(user.refreshTokenHash !== undefined && {
-          refreshTokenHash:user.refreshTokenHash,
-        }),
-        ...(user.lastLoginAt !== undefined && {
-          lastLoginAt: user.lastLoginAt,
-        }),
-        ...(user.passwordResetTokenHash !== undefined && {
-          passwordResetTokenHash: user.passwordResetTokenHash,
-        }),
-        ...(user.passwordResetExpiresAt !== undefined && {
-          passwordResetExpiresAt: user.passwordResetExpiresAt,
-        }),
-        ...(user.emailVerificationCodeHash !== undefined && {
-      emailVerificationCodeHash: user.emailVerificationCodeHash,
-    }),
-
-    ...(user.emailVerificationExpiresAt !== undefined && {
-      emailVerificationExpiresAt: user.emailVerificationExpiresAt,
-    }),
-
-    ...(user.emailVerificationLastSentAt !== undefined && {
-      emailVerificationLastSentAt: user.emailVerificationLastSentAt,
-    }),
-        },
-        $unset:{
-          ...(user.refreshTokenHash === undefined && {
-            refreshTokenHash:1,
-          }),
-          ...(user.passwordResetTokenHash === undefined && {
-            passwordResetTokenHash:1,
-          }),
-          ...(user.passwordResetExpiresAt === undefined && {
-            passwordResetExpiresAt:1,
-          }),
-          ...(user.emailVerificationCodeHash === undefined && {
-            emailVerificationCodeHash:1,
-          }),
-          ...(user.emailVerificationExpiresAt === undefined && {
-            emailVerificationExpiresAt:1,
-          }),
-            ...(user.emailVerificationLastSentAt === undefined && {
-              emailVerificationLastSentAt: 1,
-            }),
-        }
-      },
+      UserMapper.toUpdateOperations(user),
       {
         new:true,
         runValidators:true
@@ -175,7 +56,7 @@ export class MongoUserRepository implements IUserRepository {
       throw new Error("User not found");
     }
 
-    return this.toDomain(document);
+    return UserMapper.toDomain(document);
   }
 
 
@@ -186,7 +67,7 @@ export class MongoUserRepository implements IUserRepository {
 
     if(!userDocument)return null;
 
-    return this.toDomain(userDocument)
+    return UserMapper.toDomain(userDocument)
   }
 
 
@@ -203,7 +84,7 @@ export class MongoUserRepository implements IUserRepository {
     ]);
 
     return {
-      users:documents.map((document)=>this.toDomain(document)),
+      users:documents.map(UserMapper.toDomain),
       total,
       page,
       limit,

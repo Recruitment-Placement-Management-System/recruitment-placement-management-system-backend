@@ -1,4 +1,4 @@
-import { AppError } from "../../../shared/errors/app-error.js";
+import { AppError } from "../../errors/app-error.js";
 import { User } from "../../../domain/entities/user.entity.js";
 import { Company } from "../../../domain/entities/company.entity.js";
 import { RecruiterProfile } from "../../../domain/entities/recruiter-profile.entity.js";

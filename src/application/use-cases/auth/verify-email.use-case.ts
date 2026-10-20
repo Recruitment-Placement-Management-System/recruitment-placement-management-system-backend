@@ -1,4 +1,4 @@
-import { AppError } from "../../../shared/errors/app-error.js";
+import { AppError } from "../../errors/app-error.js";
 
 import type { VerifyEmailDTO } from "../../dto/auth/verify-email.dto.js";
 import type { IUserRepository } from "../../interfaces/repositories/user.repository.js";

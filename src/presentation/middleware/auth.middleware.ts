@@ -1,8 +1,8 @@
-import { AppError } from "../../shared/errors/app-error.js";
+import { AppError } from "../../application/errors/app-error.js";
 import type { Request,Response,NextFunction } from "express";
-import {tokenService} from '../../DI/container.js';
+import type { ITokenService } from "../../application/interfaces/services/token.service.js";
 
-export const authenticate = (
+export const createAuthenticate = (tokenService: ITokenService) => (
     req:Request,
     _res:Response,
     next:NextFunction,

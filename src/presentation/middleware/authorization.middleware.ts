@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { AppError } from "../../shared/errors/app-error.js";
+import { AppError } from "../../application/errors/app-error.js";
 
 export const authorize = (...allowedRoles: string[]) => {
   return (

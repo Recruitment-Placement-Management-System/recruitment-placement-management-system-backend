@@ -1,4 +1,4 @@
-import { AppError } from "../../../shared/errors/app-error.js";
+import { AppError } from "../../errors/app-error.js";
 
 import type { IUserRepository } from "../../interfaces/repositories/user.repository.js";
 import type { IPasswordService } from "../../interfaces/services/password.service.js";

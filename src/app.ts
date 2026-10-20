@@ -5,11 +5,12 @@ import {pinoHttp} from 'pino-http'
 import cookieParser from 'cookie-parser'
 
 import { logger } from './infrastructure/logger/logger.js'
-import { errorMiddleware } from './presentation/middleware/error.middleware.js'
+import { createErrorMiddleware } from './presentation/middleware/error.middleware.js'
 import { notFoundMiddleware } from './presentation/middleware/not-found.middleware.js'
 
-import authRoutes from './presentation/auth/routes/auth.routes.js'
-import adminRoutes from './presentation/admin/routes/admin.routes.js'
+import { createAuthRouter } from './presentation/auth/routes/auth.routes.js'
+import { createAdminRouter } from './presentation/admin/routes/admin.routes.js'
+import { authDependencies, adminDependencies } from './DI/container.js'
 
 const app = express()
 
@@ -22,11 +23,11 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(pinoHttp({logger}))
 
-app.use('/api/auth',authRoutes)
-app.use('/api/admin',adminRoutes)
+app.use('/api/auth', createAuthRouter(authDependencies))
+app.use('/api/admin', createAdminRouter(adminDependencies))
 
 
 app.use(notFoundMiddleware);
-app.use(errorMiddleware)
+app.use(createErrorMiddleware(logger))
 
 export default app;

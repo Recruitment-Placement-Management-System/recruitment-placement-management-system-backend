@@ -1,4 +1,4 @@
-import { AppError } from "../../../shared/errors/app-error.js";
+import { AppError } from "../../errors/app-error.js";
 import type { IUserRepository } from "../../interfaces/repositories/user.repository.js";
 import type { IPasswordService } from "../../interfaces/services/password.service.js";
 import type { ITokenService } from "../../interfaces/services/token.service.js";
@@ -40,15 +40,19 @@ export class RefreshAccessTokenUseCase{
     throw new AppError(401, 'Invalid refresh token');
   }
 
+  if (!user.id) {
+    throw new AppError(500, "User ID is missing", "USER_ID_MISSING");
+  }
+
   const accessToken = this.tokenService.generateAccessToken({
-    userId: user.id!,
+    userId: user.id,
     roles: user.roles,
   });
 
   return {
     accessToken,
     user: {
-      id: user.id!,
+      id: user.id,
       email: user.email,
       roles: user.roles,
     },

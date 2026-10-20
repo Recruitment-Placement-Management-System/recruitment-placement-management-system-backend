@@ -1,4 +1,4 @@
-import { AppError } from "../../../shared/errors/app-error.js";
+import { AppError } from "../../errors/app-error.js";
 
 import  { User } from "../../../domain/entities/user.entity.js";
 import { generateVerificationCode } from "../../../shared/utils/generate-verification-code.js";
@@ -63,3 +63,4 @@ export class RegisterCandidateUseCase{
         return createdUser;
     }
 }
+
