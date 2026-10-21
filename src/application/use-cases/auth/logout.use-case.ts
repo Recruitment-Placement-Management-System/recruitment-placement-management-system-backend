@@ -1,4 +1,5 @@
 import { AppError } from "../../errors/app-error.js";
+import { HttpStatus } from "../../../shared/constants/http-status.js";
 import type { IUserRepository } from "../../interfaces/repositories/user.repository.js";
 import type { IPasswordService } from "../../interfaces/services/password.service.js";
 import type { ITokenService } from "../../interfaces/services/token.service.js";
@@ -17,13 +18,13 @@ export class LogoutUseCase{
         const user = await this.userRepository.findById(payload.userId);
 
         if(!user || !user.refreshTokenHash){
-            throw new AppError(401,'Invalid refresh token')
+            throw new AppError(HttpStatus.UNAUTHORIZED,'Invalid refresh token')
         }
 
         const isValid = await this.passwordService.compare(input.refreshToken,user.refreshTokenHash);
 
         if(!isValid){
-            throw new AppError(401,'Invalid refresh token')
+            throw new AppError(HttpStatus.UNAUTHORIZED,'Invalid refresh token')
         }
 
         user.refreshTokenHash = undefined;

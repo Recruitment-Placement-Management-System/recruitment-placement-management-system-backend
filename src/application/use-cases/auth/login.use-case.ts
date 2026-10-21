@@ -4,6 +4,7 @@ import type { IUserRepository } from "../../interfaces/repositories/user.reposit
 import type { IPasswordService } from "../../interfaces/services/password.service.js";
 import type { ITokenService } from "../../interfaces/services/token.service.js";
 import type { LoginDTO } from "../../dto/auth/login.dto.js";
+import { HttpStatus } from "../../../shared/constants/http-status.js";
 
 export class LoginUseCase{
     constructor(
@@ -17,7 +18,7 @@ export class LoginUseCase{
 
         if(!user){
             throw new AppError(
-                401,
+                HttpStatus.UNAUTHORIZED,
                 'Invalid email or password',
                 'INVALID_CREDENTIALS',
             )
@@ -27,7 +28,7 @@ export class LoginUseCase{
 
         if (!isPasswordValid) {
       throw new AppError(
-        401,
+        HttpStatus.UNAUTHORIZED,
         "Invalid email or password",
         "INVALID_CREDENTIALS",
       );
@@ -35,7 +36,7 @@ export class LoginUseCase{
 
     if (!user.isEmailVerified) {
       throw new AppError(
-        403,
+        HttpStatus.FORBIDDEN,
         "Please verify your email before logging in",
         "EMAIL_NOT_VERIFIED",
       );
@@ -43,14 +44,14 @@ export class LoginUseCase{
 
     if (user.status !== "active") {
       throw new AppError(
-        403,
+        HttpStatus.FORBIDDEN,
         "Your account is not active",
         "ACCOUNT_NOT_ACTIVE",
       );
     }
 
     if (!user.id) {
-      throw new AppError(500, "User ID is missing", "USER_ID_MISSING");
+      throw new AppError(HttpStatus.INTERNAL_SERVER_ERROR, "User ID is missing", "USER_ID_MISSING");
     }
 
     const accessToken = this.tokenService.generateAccessToken({userId:user.id,roles:user.roles})

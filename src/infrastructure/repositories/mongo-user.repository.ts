@@ -7,8 +7,13 @@ import {
 import type { UserQueryOptions,PaginatedUserResult } from "../../application/dto/admin/paginated-users.dto.js";
 import { getPagination } from "../../shared/utils/pagination.js";
 import { UserMapper } from "../mappers/user.mapper.js";
+import { MongoBaseRepository } from "./mongo-base.repository.js";
 
-export class MongoUserRepository implements IUserRepository, IAdminUserQueryRepository {
+export class MongoUserRepository extends MongoBaseRepository<User, import("../database/models/user.model.js").UserDocument, ReturnType<typeof UserMapper.toCreateData>, ReturnType<typeof UserMapper.toUpdateOperations>> implements IUserRepository, IAdminUserQueryRepository {
+  constructor() {
+    super(UserModel, UserMapper.toDomain, UserMapper.toCreateData, UserMapper.toUpdateOperations, "User not found");
+  }
+
   async findById(id: string): Promise<User | null> {
     const document = await UserModel.findById(id).exec();
 
@@ -32,33 +37,6 @@ export class MongoUserRepository implements IUserRepository, IAdminUserQueryRepo
 
     return UserMapper.toDomain(document);
   }
-
-  async create(user: User): Promise<User> {
-    const document = await UserModel.create(UserMapper.toCreateData(user));
-    return UserMapper.toDomain(document);
-}
-
-  async update(user: User): Promise<User> {
-    if (!user.id) {
-      throw new Error("Cannot update a user without an id");
-    }
-
-    const document = await UserModel.findByIdAndUpdate(
-      user.id,
-      UserMapper.toUpdateOperations(user),
-      {
-        new:true,
-        runValidators:true
-      },
-    ).exec()
-
-    if (!document) {
-      throw new Error("User not found");
-    }
-
-    return UserMapper.toDomain(document);
-  }
-
 
   async findByPasswordResetTokenHash(tokenHash: string): Promise<User | null> {
     const userDocument = await UserModel.findOne({

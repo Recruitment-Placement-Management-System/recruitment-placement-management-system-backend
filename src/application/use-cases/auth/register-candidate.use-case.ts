@@ -7,6 +7,7 @@ import type { RegisterCandidateDTO } from "../../dto/auth/register-candidate.dto
 import type { IUserRepository } from "../../interfaces/repositories/user.repository.js";
 import type { IEmailService } from "../../interfaces/services/email.service.js";
 import type { IPasswordService } from "../../interfaces/services/password.service.js";
+import { HttpStatus } from "../../../shared/constants/http-status.js";
 
 
 
@@ -24,7 +25,7 @@ export class RegisterCandidateUseCase{
 
         if(existingUser){
             throw new AppError(
-                409,
+                HttpStatus.CONFLICT,
                 'Email is already registered',
                 'EMAIL_ALREADY_REGISTERED',
             )

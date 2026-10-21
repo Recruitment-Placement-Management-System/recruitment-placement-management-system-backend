@@ -25,6 +25,7 @@ export class UserMapper {
       status: user.status,
       isEmailVerified: user.isEmailVerified,
     };
+    
     const optionalFields = {
       phone: user.phone, fullName: user.fullName,
       refreshTokenHash: user.refreshTokenHash, lastLoginAt: user.lastLoginAt,

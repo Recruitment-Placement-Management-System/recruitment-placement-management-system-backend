@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { AppError } from "../../application/errors/app-error.js";
+import { HttpStatus } from "../../shared/constants/http-status.js";
 
 export const authorize = (...allowedRoles: string[]) => {
   return (
@@ -9,7 +10,7 @@ export const authorize = (...allowedRoles: string[]) => {
   ): void => {
     try {
       if (!req.user) {
-        throw new AppError(401, "Authentication required");
+        throw new AppError(HttpStatus.UNAUTHORIZED, "Authentication required");
       }
 
       const hasRole = req.user.roles.some((role) =>
@@ -17,7 +18,7 @@ export const authorize = (...allowedRoles: string[]) => {
       );
 
       if (!hasRole) {
-        throw new AppError(403, "You are not authorized");
+        throw new AppError(HttpStatus.FORBIDDEN, "You are not authorized");
       }
 
       next();

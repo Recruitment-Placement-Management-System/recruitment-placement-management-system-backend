@@ -1,4 +1,5 @@
 import { AppError } from "../../errors/app-error.js";
+import { HttpStatus } from "../../../shared/constants/http-status.js";
 import type { IUserRepository } from "../../interfaces/repositories/user.repository.js";
 import type { IPasswordService } from "../../interfaces/services/password.service.js";
 import type { ITokenService } from "../../interfaces/services/token.service.js";
@@ -28,7 +29,7 @@ export class RefreshAccessTokenUseCase{
   const user = await this.userRepository.findById(payload.userId);
 
   if (!user || !user.refreshTokenHash) {
-    throw new AppError(401, 'Invalid refresh token');
+    throw new AppError(HttpStatus.UNAUTHORIZED, 'Invalid refresh token');
   }
 
   const isValid = await this.passwordService.compare(
@@ -37,11 +38,11 @@ export class RefreshAccessTokenUseCase{
   );
 
   if (!isValid) {
-    throw new AppError(401, 'Invalid refresh token');
+    throw new AppError(HttpStatus.UNAUTHORIZED, 'Invalid refresh token');
   }
 
   if (!user.id) {
-    throw new AppError(500, "User ID is missing", "USER_ID_MISSING");
+    throw new AppError(HttpStatus.INTERNAL_SERVER_ERROR, "User ID is missing", "USER_ID_MISSING");
   }
 
   const accessToken = this.tokenService.generateAccessToken({

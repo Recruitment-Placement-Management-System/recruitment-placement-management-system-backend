@@ -10,6 +10,7 @@ import type { RefreshAccessTokenUseCase } from "../../../application/use-cases/a
 import type { LogoutUseCase } from "../../../application/use-cases/auth/logout.use-case.js";
 import { AppError } from "../../../application/errors/app-error.js";
 import { clearRefreshTokenCookie, setRefreshTokenCookie } from "../auth-cookie.js";
+import { HttpStatus } from "../../../shared/constants/http-status.js";
 
 export interface AuthControllerDependencies {
   registerCandidateUseCase: RegisterCandidateUseCase;
@@ -30,7 +31,7 @@ export const createAuthController = (dependencies: AuthControllerDependencies) =
   return {
     registerCandidate: wrap(async (req, res) => {
       const user = await dependencies.registerCandidateUseCase.execute(req.body);
-      res.status(201).json({
+      res.status(HttpStatus.CREATED).json({
         message: "Registration successful. Please verify your email.",
         user: {
           id: user.id, fullName: user.fullName, email: user.email,
@@ -42,19 +43,19 @@ export const createAuthController = (dependencies: AuthControllerDependencies) =
 
     verifyEmail: wrap(async (req, res) => {
       await dependencies.verifyEmailUseCase.execute(req.body);
-      res.status(200).json({ message: "Email verified successfully" });
+      res.status(HttpStatus.OK).json({ message: "Email verified successfully" });
     }),
 
     resendVerificationEmail: wrap(async (req, res) => {
       await dependencies.resendVerificationEmailUseCase.execute(req.body);
-      res.status(200).json({
+      res.status(HttpStatus.OK).json({
         message: "If the account requires email verification, a verification email has been sent.",
       });
     }),
 
     registerRecruiter: wrap(async (req, res) => {
       const recruiter = await dependencies.registerRecruiterUseCase.execute(req.body);
-      res.status(201).json({
+      res.status(HttpStatus.CREATED).json({
         message: "Recruiter registered successfully. Please verify your email",
         userId: recruiter.id,
       });
@@ -63,32 +64,32 @@ export const createAuthController = (dependencies: AuthControllerDependencies) =
     login: wrap(async (req, res) => {
       const result = await dependencies.loginUseCase.execute(req.body);
       setRefreshTokenCookie(res, result.refreshToken);
-      res.status(200).json({ message: "Login successful", accessToken: result.accessToken, user: result.user });
+      res.status(HttpStatus.OK).json({ message: "Login successful", accessToken: result.accessToken, user: result.user });
     }),
 
     forgotPassword: wrap(async (req, res) => {
       await dependencies.forgotPasswordUseCase.execute(req.body);
-      res.status(200).json({ message: "If an account with that email exists, a password reset link has been sent" });
+      res.status(HttpStatus.OK).json({ message: "If an account with that email exists, a password reset link has been sent" });
     }),
 
     resetPassword: wrap(async (req, res) => {
       await dependencies.resetPasswordUseCase.execute(req.body);
-      res.status(200).json({ message: "Password has been reset successfully" });
+      res.status(HttpStatus.OK).json({ message: "Password has been reset successfully" });
     }),
 
     refreshAccessToken: wrap(async (req, res) => {
       const refreshToken = req.cookies.refreshToken;
-      if (!refreshToken) throw new AppError(401, "Refresh token not found", "REFRESH_TOKEN_NOT_FOUND");
+      if (!refreshToken) throw new AppError(HttpStatus.UNAUTHORIZED, "Refresh token not found", "REFRESH_TOKEN_NOT_FOUND");
       const result = await dependencies.refreshAccessTokenUseCase.execute({ refreshToken });
-      res.status(200).json({ accessToken: result.accessToken, user: result.user });
+      res.status(HttpStatus.OK).json({ accessToken: result.accessToken, user: result.user });
     }),
 
     logout: wrap(async (req, res) => {
       const refreshToken = req.cookies.refreshToken;
-      if (!refreshToken) throw new AppError(401, "Refresh token not found", "REFRESH_TOKEN_NOT_FOUND");
+      if (!refreshToken) throw new AppError(HttpStatus.UNAUTHORIZED, "Refresh token not found", "REFRESH_TOKEN_NOT_FOUND");
       await dependencies.logoutUseCase.execute({ refreshToken });
       clearRefreshTokenCookie(res);
-      res.status(200).json({ message: "Logout successful" });
+      res.status(HttpStatus.OK).json({ message: "Logout successful" });
     }),
   };
 };

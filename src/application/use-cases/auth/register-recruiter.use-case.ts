@@ -13,6 +13,7 @@ import type { IRecruiterProfileRepository } from "../../interfaces/repositories/
 import type { IVerificationRequestRepository } from "../../interfaces/repositories/verification-request.repository.js";
 import type { IPasswordService } from "../../interfaces/services/password.service.js";
 import type { IEmailService } from "../../interfaces/services/email.service.js";
+import { HttpStatus } from "../../../shared/constants/http-status.js";
 
 
 export class RegisterRecruiterUseCase {
@@ -30,7 +31,7 @@ export class RegisterRecruiterUseCase {
 
         if(existingUser){
             throw new AppError(
-                409,
+                HttpStatus.CONFLICT,
                 'Email is already registered',
                 'EMAIL_ALREADY_REGISTERED',
             )

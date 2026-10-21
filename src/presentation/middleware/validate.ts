@@ -1,6 +1,7 @@
 import type { RequestHandler } from "express"
 import type { ZodType } from "zod"
 import { AppError } from "../../application/errors/app-error.js"
+import { HttpStatus } from "../../shared/constants/http-status.js"
 
 export const validate = (schema:ZodType,):RequestHandler=>{
     return(req,_res,next)=>{
@@ -8,7 +9,7 @@ export const validate = (schema:ZodType,):RequestHandler=>{
 
         if(!result.success){
             throw new AppError(
-                400,
+                HttpStatus.BAD_REQUEST,
                 'Validation failed',
                 'VALIDATION_ERROR',
             );

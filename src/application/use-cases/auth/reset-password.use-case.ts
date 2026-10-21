@@ -1,4 +1,5 @@
 import { AppError } from "../../errors/app-error.js";
+import { HttpStatus } from "../../../shared/constants/http-status.js";
 
 import type { IUserRepository } from "../../interfaces/repositories/user.repository.js";
 import type { IPasswordService } from "../../interfaces/services/password.service.js";
@@ -17,11 +18,11 @@ export class ResetPasswordUseCase{
         const user = await this.userRepository.findByPasswordResetTokenHash(tokenHash);
 
         if(!user || !user.passwordResetExpiresAt){
-            throw new AppError(400,'Invalid or expired reset token')
+            throw new AppError(HttpStatus.BAD_REQUEST,'Invalid or expired reset token')
         }
 
         if(user.passwordResetExpiresAt.getTime()<=Date.now()){
-            throw new AppError(400,'Invalid or expired reset token');
+            throw new AppError(HttpStatus.BAD_REQUEST,'Invalid or expired reset token');
         }
 
         user.passwordHash = await this.passwordService.hash(input.newPassword);
