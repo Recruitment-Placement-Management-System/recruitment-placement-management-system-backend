@@ -4,7 +4,7 @@ import type { IAdminUserQueryRepository } from "../../application/interfaces/rep
 import {
   UserModel,
 } from "../database/models/user.model.js";
-import type { UserQueryOptions,PaginatedUserResult } from "../../application/dto/admin/paginated-users.dto.js";
+import type { UserQueryOptions, PaginatedUserResult } from "../../application/dto/admin/paginated-users.dto.js";
 import { getPagination } from "../../shared/utils/pagination.js";
 import { UserMapper } from "../mappers/user.mapper.js";
 import { MongoBaseRepository } from "./mongo-base.repository.js";
@@ -53,20 +53,37 @@ export class MongoUserRepository extends MongoBaseRepository<User, import("../da
 
 
   async findPaginated(options: UserQueryOptions): Promise<PaginatedUserResult<User>> {
-    const {page,limit} = options;
-    const {skip} = getPagination(page,limit);
+    const { page, limit, sortBy, sortOrder, search } = options;
+    const { skip } = getPagination(page, limit);
+    const sortDirection = sortOrder === "asc" ? 1 : -1;
+    const filter = search
+      ? {
+          $or: [
+            { fullName: { $regex: escapeRegex(search), $options: "i" } },
+            { email: { $regex: escapeRegex(search), $options: "i" } },
+          ],
+        }
+      : {};
 
     const [documents,total] = await Promise.all([
-      UserModel.find().skip(skip).limit(limit).exec(),
-      UserModel.countDocuments().exec(),
+      UserModel.find(filter)
+        .collation({ locale: "en", strength: 2 })
+        .sort({ [sortBy]: sortDirection, _id: sortDirection })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      UserModel.countDocuments(filter).exec(),
     ]);
 
     return {
-      users:documents.map(UserMapper.toDomain),
+      users: documents.map(UserMapper.toDomain),
       total,
       page,
       limit,
-      pages:Math.ceil(total/limit)
-    }
+      pages: Math.ceil(total / limit),
+    };
   }
 }
+
+const escapeRegex = (value: string): string =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
