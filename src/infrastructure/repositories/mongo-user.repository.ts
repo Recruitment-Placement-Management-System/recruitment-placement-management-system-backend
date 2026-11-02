@@ -1,0 +1,89 @@
+import { User } from "../../domain/entities/user.entity.js";
+import type { IUserRepository } from "../../application/interfaces/repositories/user.repository.js";
+import type { IAdminUserQueryRepository } from "../../application/interfaces/repositories/admin-user-query.repository.js";
+import {
+  UserModel,
+} from "../database/models/user.model.js";
+import type { UserQueryOptions, PaginatedUserResult } from "../../application/dto/admin/paginated-users.dto.js";
+import { getPagination } from "../../shared/utils/pagination.js";
+import { UserMapper } from "../mappers/user.mapper.js";
+import { MongoBaseRepository } from "./mongo-base.repository.js";
+
+export class MongoUserRepository extends MongoBaseRepository<User, import("../database/models/user.model.js").UserDocument, ReturnType<typeof UserMapper.toCreateData>, ReturnType<typeof UserMapper.toUpdateOperations>> implements IUserRepository, IAdminUserQueryRepository {
+  constructor() {
+    super(UserModel, UserMapper.toDomain, UserMapper.toCreateData, UserMapper.toUpdateOperations, "User not found");
+  }
+
+  async findById(id: string): Promise<User | null> {
+    const document = await UserModel.findById(id).exec();
+
+    if (!document) {
+      return null;
+    }
+
+    return UserMapper.toDomain(document);
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    const document = await UserModel
+      .findOne({
+        email: email.trim().toLowerCase(),
+      })
+      .exec();
+
+    if (!document) {
+      return null;
+    }
+
+    return UserMapper.toDomain(document);
+  }
+
+  async findByPasswordResetTokenHash(tokenHash: string): Promise<User | null> {
+    const userDocument = await UserModel.findOne({
+      passwordResetTokenHash:tokenHash
+    })
+
+    if(!userDocument)return null;
+
+    return UserMapper.toDomain(userDocument)
+  }
+
+
+
+
+
+  async findPaginated(options: UserQueryOptions): Promise<PaginatedUserResult<User>> {
+    const { page, limit, sortBy, sortOrder, search } = options;
+    const { skip } = getPagination(page, limit);
+    const sortDirection = sortOrder === "asc" ? 1 : -1;
+    const filter = search
+      ? {
+          $or: [
+            { fullName: { $regex: escapeRegex(search), $options: "i" } },
+            { email: { $regex: escapeRegex(search), $options: "i" } },
+          ],
+        }
+      : {};
+
+    const [documents,total] = await Promise.all([
+      UserModel.find(filter)
+        .collation({ locale: "en", strength: 2 })
+        .sort({ [sortBy]: sortDirection, _id: sortDirection })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      UserModel.countDocuments(filter).exec(),
+    ]);
+
+    return {
+      users: documents.map(UserMapper.toDomain),
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit),
+    };
+  }
+}
+
+const escapeRegex = (value: string): string =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
