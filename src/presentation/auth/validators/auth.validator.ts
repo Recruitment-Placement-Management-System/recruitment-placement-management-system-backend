@@ -23,6 +23,11 @@ export const resendVerificationEmailSchema = z.object({
     email:z.string().trim().email('Invalid email address')
 });
 
+export const changeVerificationEmailSchema = z.object({
+    currentEmail: z.string().trim().email('Invalid current email address'),
+    newEmail: z.string().trim().email('Invalid new email address'),
+});
+
 export const registerRecruiterSchema = z.object({
   fullName: z.string().trim().min(2, "Full name is required"),
   phone: z.string().trim().min(10, "Invalid phone number"),

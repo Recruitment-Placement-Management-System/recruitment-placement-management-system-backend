@@ -5,6 +5,7 @@ import type { IPasswordService } from "../../interfaces/services/password.servic
 import type { ITokenService } from "../../interfaces/services/token.service.js";
 import type { LoginDTO } from "../../dto/auth/login.dto.js";
 import { HttpStatus } from "../../../shared/constants/http-status.js";
+import type { UserRole } from "../../../domain/entities/user.entity.js";
 
 export class LoginUseCase{
     constructor(
@@ -13,7 +14,7 @@ export class LoginUseCase{
         private readonly tokenService:ITokenService,
     ){}
 
-    async execute(input:LoginDTO){
+    async execute(input:LoginDTO, allowedRoles?: UserRole[]){
         const user = await this.userRepository.findByEmail(input.email);
 
         if(!user){
@@ -48,6 +49,15 @@ export class LoginUseCase{
         "Your account is not active",
         "ACCOUNT_NOT_ACTIVE",
       );
+    }
+
+    const hasAllowedRole = allowedRoles?.some((role) => user.roles.includes(role));
+    const isAdminLogin = allowedRoles?.includes("admin") ?? false;
+    if (allowedRoles && (!hasAllowedRole || (!isAdminLogin && user.roles.includes("admin")))) {
+      const message = allowedRoles.includes("admin")
+        ? "Admin access required"
+        : "Administrators must sign in through the admin login page";
+      throw new AppError(HttpStatus.FORBIDDEN, message, "ROLE_NOT_ALLOWED");
     }
 
     if (!user.id) {

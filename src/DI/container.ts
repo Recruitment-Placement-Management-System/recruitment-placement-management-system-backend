@@ -1,6 +1,7 @@
 import { RegisterCandidateUseCase } from '../application/use-cases/auth/register-candidate.use-case.js';
 import { VerifyEmailUseCase } from '../application/use-cases/auth/verify-email.use-case.js';
 import { ResendVerificationEmailUseCase } from '../application/use-cases/auth/resend-verification-email.use-case.js';
+import { ChangeVerificationEmailUseCase } from '../application/use-cases/auth/change-verification-email.use-case.js';
 import { RegisterRecruiterUseCase } from '../application/use-cases/auth/register-recruiter.use-case.js';
 import { LoginUseCase } from '../application/use-cases/auth/login.use-case.js';
 import { ForgotPasswordUseCase } from '../application/use-cases/auth/forgot-password.use-case.js';
@@ -37,6 +38,12 @@ export const verifyEmailUseCase = new VerifyEmailUseCase(
 );
 
 export const resendVerificationEmailUseCase = new ResendVerificationEmailUseCase(
+  userRepository,
+  passwordService,
+  emailService,
+);
+
+export const changeVerificationEmailUseCase = new ChangeVerificationEmailUseCase(
   userRepository,
   passwordService,
   emailService,
@@ -83,6 +90,7 @@ export const authDependencies = {
   registerCandidateUseCase,
   verifyEmailUseCase,
   resendVerificationEmailUseCase,
+  changeVerificationEmailUseCase,
   registerRecruiterUseCase,
   loginUseCase,
   forgotPasswordUseCase,

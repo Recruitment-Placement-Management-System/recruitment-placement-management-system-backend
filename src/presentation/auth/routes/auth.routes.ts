@@ -3,7 +3,7 @@ import { createAuthController, type AuthControllerDependencies } from "../contro
 import { validate } from "../../middleware/validate.js";
 import {
   forgotPasswordSchema, loginSchema, registerCandidateSchema,
-  registerRecruiterSchema, resendVerificationEmailSchema,
+  registerRecruiterSchema, resendVerificationEmailSchema, changeVerificationEmailSchema,
   resetPasswordSchema, verifyEmailSchema,
 } from "../validators/auth.validator.js";
 
@@ -14,6 +14,7 @@ export const createAuthRouter = (dependencies: AuthControllerDependencies) => {
   router.post("/register", validate(registerCandidateSchema), controller.registerCandidate);
   router.post("/verify-email", validate(verifyEmailSchema), controller.verifyEmail);
   router.post("/resend-verification", validate(resendVerificationEmailSchema), controller.resendVerificationEmail);
+  router.post("/change-verification-email", validate(changeVerificationEmailSchema), controller.changeVerificationEmail);
   router.post("/register/recruiter", validate(registerRecruiterSchema), controller.registerRecruiter);
   router.post("/login", validate(loginSchema), controller.login);
   router.post("/forgot-password", validate(forgotPasswordSchema), controller.forgotPassword);
