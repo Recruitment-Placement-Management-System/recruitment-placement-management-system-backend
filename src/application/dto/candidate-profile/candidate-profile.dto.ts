@@ -1,5 +1,6 @@
 import type {
   CandidateProfile,
+  CandidateEducation,
   CandidateProfileItem,
   CandidateProfileJson,
 } from "../../../domain/entities/candidate-profile.entity.js";
@@ -13,7 +14,7 @@ export interface CreateCandidateProfileDto {
   personalInfo?: CandidateProfileJson;
   contactLinks?: CandidateProfileJson;
   skills?: string[];
-  education?: CandidateProfileJson[];
+  education?: CandidateEducation[];
   experience?: CandidateProfileJson[];
   projects?: CandidateProfileJson[];
   certifications?: CandidateProfileJson[];

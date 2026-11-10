@@ -3,6 +3,16 @@ export type CandidateVerificationStatus = "pending" | "verified" | "rejected";
 export type CandidateProfileJson = Record<string, unknown>;
 export type CandidateProfileItem = string | CandidateProfileJson;
 
+export interface CandidateEducation {
+  institution: string;
+  degree: string;
+  fieldOfStudy?: string;
+  startDate?: string;
+  endDate?: string;
+  grade?: string;
+  description?: string;
+}
+
 export class CandidateProfile {
   constructor(
     public readonly id: string | undefined,
@@ -15,7 +25,7 @@ export class CandidateProfile {
     public personalInfo: CandidateProfileJson,
     public contactLinks: CandidateProfileJson,
     public skills: CandidateProfileItem[],
-    public education: CandidateProfileItem[],
+    public education: CandidateEducation[],
     public experience: CandidateProfileItem[],
     public projects: CandidateProfileItem[],
     public certifications: CandidateProfileItem[],

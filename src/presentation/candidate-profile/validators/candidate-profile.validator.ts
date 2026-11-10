@@ -4,6 +4,22 @@ const jsonObjectSchema = z.record(z.string(), z.unknown());
 const jsonArraySchema = z.array(jsonObjectSchema);
 const profileItemArraySchema = z.array(z.union([z.string().trim().min(1), jsonObjectSchema]));
 const skillNameSchema = z.string().trim().min(1, "Skill name is required").max(80, "Skill name cannot exceed 80 characters");
+const educationDateSchema = z.union([
+  z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must use YYYY-MM-DD").refine((value) => {
+    const date = new Date(`${value}T00:00:00.000Z`);
+    return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+  }, "Date must be a valid calendar date"),
+  z.literal(""),
+]);
+const candidateEducationSchema = z.object({
+  institution: z.string().trim().min(1).max(160),
+  degree: z.string().trim().min(1).max(160),
+  fieldOfStudy: z.string().trim().max(160).optional(),
+  startDate: educationDateSchema.optional(),
+  endDate: educationDateSchema.optional(),
+  grade: z.string().trim().max(80).optional(),
+  description: z.string().trim().max(2000).optional(),
+}).strict();
 const uniqueSkillArraySchema = z.array(skillNameSchema).refine((skills) => {
   const names = skills.map((skill) => skill.toLowerCase());
   return new Set(names).size === names.length;
@@ -18,7 +34,7 @@ export const createCandidateProfileSchema = z.object({
   personalInfo: jsonObjectSchema.optional(),
   contactLinks: jsonObjectSchema.optional(),
   skills: uniqueSkillArraySchema.optional(),
-  education: jsonArraySchema.optional(),
+  education: z.array(candidateEducationSchema).optional(),
   experience: jsonArraySchema.optional(),
   projects: jsonArraySchema.optional(),
   certifications: jsonArraySchema.optional(),
@@ -87,4 +103,25 @@ export const updateCandidateSkillSchema = z.object({
 
 export const removeCandidateSkillSchema = z.object({
   skill: skillNameSchema,
+}).strict();
+
+export const addCandidateEducationSchema = candidateEducationSchema;
+
+const educationUpdateFieldsSchema = candidateEducationSchema.partial();
+export const updateCandidateEducationSchema = z.object({
+  index: z.number().int().min(0),
+  institution: educationUpdateFieldsSchema.shape.institution,
+  degree: educationUpdateFieldsSchema.shape.degree,
+  fieldOfStudy: educationUpdateFieldsSchema.shape.fieldOfStudy,
+  startDate: educationUpdateFieldsSchema.shape.startDate,
+  endDate: educationUpdateFieldsSchema.shape.endDate,
+  grade: educationUpdateFieldsSchema.shape.grade,
+  description: educationUpdateFieldsSchema.shape.description,
+}).strict().refine(
+  (value) => Object.keys(value).some((key) => key !== "index"),
+  "At least one education field must be provided",
+  );
+
+export const deleteCandidateEducationSchema = z.object({
+  index: z.number().int().min(0),
 }).strict();
