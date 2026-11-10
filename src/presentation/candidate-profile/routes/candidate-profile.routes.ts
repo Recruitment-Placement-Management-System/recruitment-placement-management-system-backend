@@ -3,13 +3,16 @@ import { createCandidateProfileController, type CandidateProfileControllerDepend
 import {
   addCandidateSkillsSchema,
   addCandidateEducationSchema,
+  addCandidateExperienceSchema,
   createCandidateProfileSchema,
   removeCandidateSkillSchema,
   deleteCandidateEducationSchema,
+  deleteCandidateExperienceSchema,
   updateCandidatePersonalInformationSchema,
   updateCandidateProfileSchema,
   updateCandidateSkillSchema,
   updateCandidateEducationSchema,
+  updateCandidateExperienceSchema,
 } from "../validators/candidate-profile.validator.js";
 import { createAuthenticate } from "../../middleware/auth.middleware.js";
 import { authorize } from "../../middleware/authorization.middleware.js";
@@ -33,6 +36,10 @@ export const createCandidateProfileRouter = (dependencies: CandidateProfileContr
   router.post("/education", validate(addCandidateEducationSchema), controller.addEducation);
   router.patch("/education", validate(updateCandidateEducationSchema), controller.updateEducation);
   router.delete("/education", validate(deleteCandidateEducationSchema), controller.deleteEducation);
+
+  router.post("/experience", validate(addCandidateExperienceSchema), controller.addExperience);
+  router.patch("/experience", validate(updateCandidateExperienceSchema), controller.updateExperience);
+  router.delete("/experience", validate(deleteCandidateExperienceSchema), controller.deleteExperience);
 
   return router;
 };

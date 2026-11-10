@@ -10,6 +10,9 @@ import type { RemoveCandidateSkillUseCase } from "../../../application/use-cases
 import type { AddCandidateEducationUseCase } from "../../../application/use-cases/candidate-profile/add-candidate-education.use-case.js";
 import type { UpdateCandidateEducationUseCase } from "../../../application/use-cases/candidate-profile/update-candidate-education.use-case.js";
 import type { DeleteCandidateEducationUseCase } from "../../../application/use-cases/candidate-profile/delete-candidate-education.use-case.js";
+import type { AddCandidateExperienceUseCase } from "../../../application/use-cases/candidate-profile/add-candidate-experience.use-case.js";
+import type { UpdateCandidateExperienceUseCase } from "../../../application/use-cases/candidate-profile/update-candidate-experience.use-case.js";
+import type { DeleteCandidateExperienceUseCase } from "../../../application/use-cases/candidate-profile/delete-candidate-experience.use-case.js";
 import type { CandidateProfile } from "../../../domain/entities/candidate-profile.entity.js";
 import { HttpStatus } from "../../../shared/constants/http-status.js";
 
@@ -24,6 +27,9 @@ export interface CandidateProfileControllerDependencies {
   addCandidateEducationUseCase: AddCandidateEducationUseCase;
   updateCandidateEducationUseCase: UpdateCandidateEducationUseCase;
   deleteCandidateEducationUseCase: DeleteCandidateEducationUseCase;
+  addCandidateExperienceUseCase: AddCandidateExperienceUseCase;
+  updateCandidateExperienceUseCase: UpdateCandidateExperienceUseCase;
+  deleteCandidateExperienceUseCase: DeleteCandidateExperienceUseCase;
   tokenService: ITokenService;
 }
 
@@ -87,6 +93,21 @@ export const createCandidateProfileController = (
     deleteEducation: wrap(async (req, res) => {
       const profile = await dependencies.deleteCandidateEducationUseCase.execute(req.user!.userId, req.body);
       res.status(HttpStatus.OK).json({ message: "Education deleted successfully", profile: toCandidateProfileResponse(profile) });
+    }),
+
+    addExperience: wrap(async (req, res) => {
+      const profile = await dependencies.addCandidateExperienceUseCase.execute(req.user!.userId, req.body);
+      res.status(HttpStatus.CREATED).json({ message: "Work experience added successfully", profile: toCandidateProfileResponse(profile) });
+    }),
+
+    updateExperience: wrap(async (req, res) => {
+      const profile = await dependencies.updateCandidateExperienceUseCase.execute(req.user!.userId, req.body);
+      res.status(HttpStatus.OK).json({ message: "Work experience updated successfully", profile: toCandidateProfileResponse(profile) });
+    }),
+
+    deleteExperience: wrap(async (req, res) => {
+      const profile = await dependencies.deleteCandidateExperienceUseCase.execute(req.user!.userId, req.body);
+      res.status(HttpStatus.OK).json({ message: "Work experience deleted successfully", profile: toCandidateProfileResponse(profile) });
     }),
   };
 };

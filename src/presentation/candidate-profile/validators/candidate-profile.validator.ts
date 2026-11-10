@@ -35,7 +35,7 @@ export const createCandidateProfileSchema = z.object({
   contactLinks: jsonObjectSchema.optional(),
   skills: uniqueSkillArraySchema.optional(),
   education: z.array(candidateEducationSchema).optional(),
-  experience: jsonArraySchema.optional(),
+  experience: z.array(z.lazy(() => candidateExperienceSchema)).optional(),
   projects: jsonArraySchema.optional(),
   certifications: jsonArraySchema.optional(),
   languages: profileItemArraySchema.optional(),
@@ -123,5 +123,59 @@ export const updateCandidateEducationSchema = z.object({
   );
 
 export const deleteCandidateEducationSchema = z.object({
+  index: z.number().int().min(0),
+}).strict();
+
+const experienceDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must use YYYY-MM-DD").refine((value) => {
+  const date = new Date(`${value}T00:00:00.000Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}, "Date must be a valid calendar date");
+
+const experienceFields = {
+  companyName: z.string().trim().min(1).max(160),
+  jobTitle: z.string().trim().min(1).max(160),
+  employmentType: z.string().trim().max(80).optional(),
+  location: z.string().trim().max(160).optional(),
+  startDate: experienceDateSchema,
+  endDate: experienceDateSchema.or(z.literal("")).optional(),
+  isCurrent: z.boolean(),
+  description: z.string().trim().max(3000).optional(),
+};
+
+const candidateExperienceSchema = z.object(experienceFields).strict().refine(
+  (experience) => experience.isCurrent || Boolean(experience.endDate),
+  { message: "End date is required when the role is not current", path: ["endDate"] },
+).refine(
+  (experience) => !experience.isCurrent || !experience.endDate,
+  { message: "Current roles must not have an end date", path: ["endDate"] },
+).refine(
+  (experience) => !experience.endDate || experience.endDate === "" || experience.endDate >= experience.startDate,
+  { message: "End date must be on or after start date", path: ["endDate"] },
+);
+
+export const addCandidateExperienceSchema = candidateExperienceSchema;
+
+export const updateCandidateExperienceSchema = z.object({
+  index: z.number().int().min(0),
+  companyName: experienceFields.companyName.optional(),
+  jobTitle: experienceFields.jobTitle.optional(),
+  employmentType: experienceFields.employmentType,
+  location: experienceFields.location,
+  startDate: experienceFields.startDate.optional(),
+  endDate: experienceFields.endDate,
+  isCurrent: experienceFields.isCurrent.optional(),
+  description: experienceFields.description,
+}).strict().refine(
+  (value) => Object.keys(value).some((key) => key !== "index"),
+  "At least one experience field must be provided",
+).refine(
+  (experience) => !(experience.isCurrent && experience.endDate),
+  { message: "Current roles must not have an end date", path: ["endDate"] },
+).refine(
+  (experience) => !experience.startDate || !experience.endDate || experience.endDate === "" || experience.endDate >= experience.startDate,
+  { message: "End date must be on or after start date", path: ["endDate"] },
+);
+
+export const deleteCandidateExperienceSchema = z.object({
   index: z.number().int().min(0),
 }).strict();
