@@ -13,6 +13,9 @@ import type { DeleteCandidateEducationUseCase } from "../../../application/use-c
 import type { AddCandidateExperienceUseCase } from "../../../application/use-cases/candidate-profile/add-candidate-experience.use-case.js";
 import type { UpdateCandidateExperienceUseCase } from "../../../application/use-cases/candidate-profile/update-candidate-experience.use-case.js";
 import type { DeleteCandidateExperienceUseCase } from "../../../application/use-cases/candidate-profile/delete-candidate-experience.use-case.js";
+import type { AddCandidateProjectUseCase } from "../../../application/use-cases/candidate-profile/add-candidate-project.use-case.js";
+import type { UpdateCandidateProjectUseCase } from "../../../application/use-cases/candidate-profile/update-candidate-project.use-case.js";
+import type { DeleteCandidateProjectUseCase } from "../../../application/use-cases/candidate-profile/delete-candidate-project.use-case.js";
 import type { CandidateProfile } from "../../../domain/entities/candidate-profile.entity.js";
 import { HttpStatus } from "../../../shared/constants/http-status.js";
 
@@ -30,6 +33,9 @@ export interface CandidateProfileControllerDependencies {
   addCandidateExperienceUseCase: AddCandidateExperienceUseCase;
   updateCandidateExperienceUseCase: UpdateCandidateExperienceUseCase;
   deleteCandidateExperienceUseCase: DeleteCandidateExperienceUseCase;
+  addCandidateProjectUseCase: AddCandidateProjectUseCase;
+  updateCandidateProjectUseCase: UpdateCandidateProjectUseCase;
+  deleteCandidateProjectUseCase: DeleteCandidateProjectUseCase;
   tokenService: ITokenService;
 }
 
@@ -108,6 +114,21 @@ export const createCandidateProfileController = (
     deleteExperience: wrap(async (req, res) => {
       const profile = await dependencies.deleteCandidateExperienceUseCase.execute(req.user!.userId, req.body);
       res.status(HttpStatus.OK).json({ message: "Work experience deleted successfully", profile: toCandidateProfileResponse(profile) });
+    }),
+
+    addProject: wrap(async (req, res) => {
+      const profile = await dependencies.addCandidateProjectUseCase.execute(req.user!.userId, req.body);
+      res.status(HttpStatus.CREATED).json({ message: "Project added successfully", profile: toCandidateProfileResponse(profile) });
+    }),
+
+    updateProject: wrap(async (req, res) => {
+      const profile = await dependencies.updateCandidateProjectUseCase.execute(req.user!.userId, req.body);
+      res.status(HttpStatus.OK).json({ message: "Project updated successfully", profile: toCandidateProfileResponse(profile) });
+    }),
+
+    deleteProject: wrap(async (req, res) => {
+      const profile = await dependencies.deleteCandidateProjectUseCase.execute(req.user!.userId, req.body);
+      res.status(HttpStatus.OK).json({ message: "Project deleted successfully", profile: toCandidateProfileResponse(profile) });
     }),
   };
 };

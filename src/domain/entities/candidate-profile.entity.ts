@@ -24,6 +24,16 @@ export interface CandidateExperience {
   description?: string;
 }
 
+export interface CandidateProject {
+  title: string;
+  description?: string;
+  technologies: string[];
+  projectUrl?: string;
+  repositoryUrl?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
 export class CandidateProfile {
   constructor(
     public readonly id: string | undefined,
@@ -38,7 +48,7 @@ export class CandidateProfile {
     public skills: CandidateProfileItem[],
     public education: CandidateEducation[],
     public experience: CandidateExperience[],
-    public projects: CandidateProfileItem[],
+    public projects: CandidateProject[],
     public certifications: CandidateProfileItem[],
     public languages: CandidateProfileItem[],
     public resume: CandidateProfileJson,

@@ -20,6 +20,33 @@ const candidateEducationSchema = z.object({
   grade: z.string().trim().max(80).optional(),
   description: z.string().trim().max(2000).optional(),
 }).strict();
+
+const projectUrlSchema = z.string().trim().max(2048).refine((value) => {
+  if (value === "") return true;
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}, "Must be a valid HTTP or HTTPS URL, or an empty string");
+const projectTechnologiesSchema = z.array(z.string().trim().min(1).max(80)).max(30);
+const candidateProjectFields = {
+  title: z.string().trim().min(1).max(160),
+  description: z.string().trim().max(3000).optional(),
+  technologies: projectTechnologiesSchema,
+  projectUrl: projectUrlSchema.optional(),
+  repositoryUrl: projectUrlSchema.optional(),
+  startDate: educationDateSchema.optional(),
+  endDate: educationDateSchema.optional(),
+};
+const candidateProjectSchema = z.object({
+  ...candidateProjectFields,
+  technologies: projectTechnologiesSchema.default([]),
+}).strict().refine(
+  (project) => !project.startDate || !project.endDate || project.startDate === "" || project.endDate === "" || project.endDate >= project.startDate,
+  { message: "End date must be on or after start date", path: ["endDate"] },
+);
 const uniqueSkillArraySchema = z.array(skillNameSchema).refine((skills) => {
   const names = skills.map((skill) => skill.toLowerCase());
   return new Set(names).size === names.length;
@@ -36,7 +63,7 @@ export const createCandidateProfileSchema = z.object({
   skills: uniqueSkillArraySchema.optional(),
   education: z.array(candidateEducationSchema).optional(),
   experience: z.array(z.lazy(() => candidateExperienceSchema)).optional(),
-  projects: jsonArraySchema.optional(),
+  projects: z.array(candidateProjectSchema).optional(),
   certifications: jsonArraySchema.optional(),
   languages: profileItemArraySchema.optional(),
   resume: jsonObjectSchema.optional(),
@@ -177,5 +204,28 @@ export const updateCandidateExperienceSchema = z.object({
 );
 
 export const deleteCandidateExperienceSchema = z.object({
+  index: z.number().int().min(0),
+}).strict();
+
+export const addCandidateProjectSchema = candidateProjectSchema;
+
+export const updateCandidateProjectSchema = z.object({
+  index: z.number().int().min(0),
+  title: candidateProjectFields.title.optional(),
+  description: candidateProjectFields.description,
+  technologies: projectTechnologiesSchema.optional(),
+  projectUrl: candidateProjectFields.projectUrl,
+  repositoryUrl: candidateProjectFields.repositoryUrl,
+  startDate: candidateProjectFields.startDate,
+  endDate: candidateProjectFields.endDate,
+}).strict().refine(
+  (value) => Object.keys(value).some((key) => key !== "index"),
+  "At least one project field must be provided",
+).refine(
+  (project) => !project.startDate || !project.endDate || project.startDate === "" || project.endDate === "" || project.endDate >= project.startDate,
+  { message: "End date must be on or after start date", path: ["endDate"] },
+);
+
+export const deleteCandidateProjectSchema = z.object({
   index: z.number().int().min(0),
 }).strict();

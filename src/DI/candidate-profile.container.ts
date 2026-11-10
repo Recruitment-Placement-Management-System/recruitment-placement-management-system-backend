@@ -12,6 +12,9 @@ import { DeleteCandidateEducationUseCase } from "../application/use-cases/candid
 import { AddCandidateExperienceUseCase } from "../application/use-cases/candidate-profile/add-candidate-experience.use-case.js";
 import { UpdateCandidateExperienceUseCase } from "../application/use-cases/candidate-profile/update-candidate-experience.use-case.js";
 import { DeleteCandidateExperienceUseCase } from "../application/use-cases/candidate-profile/delete-candidate-experience.use-case.js";
+import { AddCandidateProjectUseCase } from "../application/use-cases/candidate-profile/add-candidate-project.use-case.js";
+import { UpdateCandidateProjectUseCase } from "../application/use-cases/candidate-profile/update-candidate-project.use-case.js";
+import { DeleteCandidateProjectUseCase } from "../application/use-cases/candidate-profile/delete-candidate-project.use-case.js";
 import { tokenService } from "./container.js";
 
 const candidateProfileRepository = new MongoCandidateProfileRepository();
@@ -30,5 +33,8 @@ export const candidateProfileDependencies = {
   addCandidateExperienceUseCase: new AddCandidateExperienceUseCase(candidateProfileRepository),
   updateCandidateExperienceUseCase: new UpdateCandidateExperienceUseCase(candidateProfileRepository),
   deleteCandidateExperienceUseCase: new DeleteCandidateExperienceUseCase(candidateProfileRepository),
+  addCandidateProjectUseCase: new AddCandidateProjectUseCase(candidateProfileRepository),
+  updateCandidateProjectUseCase: new UpdateCandidateProjectUseCase(candidateProfileRepository),
+  deleteCandidateProjectUseCase: new DeleteCandidateProjectUseCase(candidateProfileRepository),
   tokenService,
 };

@@ -4,6 +4,7 @@ import type {
   CandidateProfileItem,
   CandidateEducation,
   CandidateExperience,
+  CandidateProject,
   CandidateVerificationStatus,
 } from "../../../domain/entities/candidate-profile.entity.js";
 
@@ -19,7 +20,7 @@ export interface CandidateProfileDocument extends Document {
   skills: CandidateProfileItem[];
   education: CandidateEducation[];
   experience: CandidateExperience[];
-  projects: CandidateProfileItem[];
+  projects: CandidateProject[];
   certifications: CandidateProfileItem[];
   languages: CandidateProfileItem[];
   resume: CandidateProfileJson;
@@ -42,6 +43,10 @@ const experienceArray = {
   type: [Schema.Types.Mixed],
   default: () => [],
 } as unknown as SchemaDefinitionProperty<CandidateExperience[], CandidateProfileDocument>;
+const projectArray = {
+  type: [Schema.Types.Mixed],
+  default: () => [],
+} as unknown as SchemaDefinitionProperty<CandidateProject[], CandidateProfileDocument>;
 
 const candidateProfileSchema = new Schema<CandidateProfileDocument>(
   {
@@ -61,7 +66,7 @@ const candidateProfileSchema = new Schema<CandidateProfileDocument>(
     skills: jsonArray,
     education: educationArray,
     experience: experienceArray,
-    projects: jsonArray,
+    projects: projectArray,
     certifications: jsonArray,
     languages: jsonArray,
     resume: jsonObject,
