@@ -4,6 +4,9 @@ import type { CreateCandidateProfileUseCase } from "../../../application/use-cas
 import type { GetCandidateProfileUseCase } from "../../../application/use-cases/candidate-profile/get-candidate-profile.use-case.js";
 import type { UpdateCandidateProfileUseCase } from "../../../application/use-cases/candidate-profile/update-candidate-profile.use-case.js";
 import type { UpdateCandidatePersonalInformationUseCase } from "../../../application/use-cases/candidate-profile/update-candidate-personal-information.use-case.js";
+import type { AddCandidateSkillsUseCase } from "../../../application/use-cases/candidate-profile/add-candidate-skills.use-case.js";
+import type { UpdateCandidateSkillUseCase } from "../../../application/use-cases/candidate-profile/update-candidate-skill.use-case.js";
+import type { RemoveCandidateSkillUseCase } from "../../../application/use-cases/candidate-profile/remove-candidate-skill.use-case.js";
 import type { CandidateProfile } from "../../../domain/entities/candidate-profile.entity.js";
 import { HttpStatus } from "../../../shared/constants/http-status.js";
 
@@ -12,6 +15,9 @@ export interface CandidateProfileControllerDependencies {
   getCandidateProfileUseCase: GetCandidateProfileUseCase;
   updateCandidateProfileUseCase: UpdateCandidateProfileUseCase;
   updateCandidatePersonalInformationUseCase: UpdateCandidatePersonalInformationUseCase;
+  addCandidateSkillsUseCase: AddCandidateSkillsUseCase;
+  updateCandidateSkillUseCase: UpdateCandidateSkillUseCase;
+  removeCandidateSkillUseCase: RemoveCandidateSkillUseCase;
   tokenService: ITokenService;
 }
 
@@ -42,6 +48,18 @@ export const createCandidateProfileController = (
     updatePersonalInformation: wrap(async (req, res) => {
       const profile = await dependencies.updateCandidatePersonalInformationUseCase.execute(req.user!.userId, req.body);
       res.status(HttpStatus.OK).json({ message: "Personal information updated successfully", profile: toCandidateProfileResponse(profile) });
+    }),
+    addSkills: wrap(async (req, res) => {
+      const profile = await dependencies.addCandidateSkillsUseCase.execute(req.user!.userId, req.body);
+      res.status(HttpStatus.OK).json({ message: "Skills added successfully", profile: toCandidateProfileResponse(profile) });
+    }),
+    updateSkill: wrap(async (req, res) => {
+      const profile = await dependencies.updateCandidateSkillUseCase.execute(req.user!.userId, req.body);
+      res.status(HttpStatus.OK).json({ message: "Skill updated successfully", profile: toCandidateProfileResponse(profile) });
+    }),
+    removeSkill: wrap(async (req, res) => {
+      const profile = await dependencies.removeCandidateSkillUseCase.execute(req.user!.userId, req.body);
+      res.status(HttpStatus.OK).json({ message: "Skill removed successfully", profile: toCandidateProfileResponse(profile) });
     }),
   };
 };

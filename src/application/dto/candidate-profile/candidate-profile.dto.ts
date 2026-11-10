@@ -12,7 +12,7 @@ export interface CreateCandidateProfileDto {
   location?: CandidateProfileJson;
   personalInfo?: CandidateProfileJson;
   contactLinks?: CandidateProfileJson;
-  skills?: CandidateProfileItem[];
+  skills?: string[];
   education?: CandidateProfileJson[];
   experience?: CandidateProfileJson[];
   projects?: CandidateProfileJson[];

@@ -3,6 +3,11 @@ import { z } from "zod";
 const jsonObjectSchema = z.record(z.string(), z.unknown());
 const jsonArraySchema = z.array(jsonObjectSchema);
 const profileItemArraySchema = z.array(z.union([z.string().trim().min(1), jsonObjectSchema]));
+const skillNameSchema = z.string().trim().min(1, "Skill name is required").max(80, "Skill name cannot exceed 80 characters");
+const uniqueSkillArraySchema = z.array(skillNameSchema).refine((skills) => {
+  const names = skills.map((skill) => skill.toLowerCase());
+  return new Set(names).size === names.length;
+}, "Skills must not contain duplicates");
 
 export const createCandidateProfileSchema = z.object({
   fullName: z.string().trim().max(120).optional(),
@@ -12,7 +17,7 @@ export const createCandidateProfileSchema = z.object({
   location: jsonObjectSchema.optional(),
   personalInfo: jsonObjectSchema.optional(),
   contactLinks: jsonObjectSchema.optional(),
-  skills: profileItemArraySchema.optional(),
+  skills: uniqueSkillArraySchema.optional(),
   education: jsonArraySchema.optional(),
   experience: jsonArraySchema.optional(),
   projects: jsonArraySchema.optional(),
@@ -70,3 +75,16 @@ export const updateCandidatePersonalInformationSchema = z.object({
   (value) => Object.values(value).some((section) => section && Object.keys(section).length > 0),
   "At least one personal information field must be provided",
 );
+
+export const addCandidateSkillsSchema = z.object({
+  skills: z.array(skillNameSchema).min(1, "Provide at least one skill").max(30, "You can add up to 30 skills at a time"),
+}).strict();
+
+export const updateCandidateSkillSchema = z.object({
+  currentSkill: skillNameSchema,
+  newSkill: skillNameSchema,
+}).strict();
+
+export const removeCandidateSkillSchema = z.object({
+  skill: skillNameSchema,
+}).strict();
