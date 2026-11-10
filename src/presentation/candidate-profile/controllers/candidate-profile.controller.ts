@@ -3,6 +3,7 @@ import type { ITokenService } from "../../../application/interfaces/services/tok
 import type { CreateCandidateProfileUseCase } from "../../../application/use-cases/candidate-profile/create-candidate-profile.use-case.js";
 import type { GetCandidateProfileUseCase } from "../../../application/use-cases/candidate-profile/get-candidate-profile.use-case.js";
 import type { UpdateCandidateProfileUseCase } from "../../../application/use-cases/candidate-profile/update-candidate-profile.use-case.js";
+import type { UpdateCandidatePersonalInformationUseCase } from "../../../application/use-cases/candidate-profile/update-candidate-personal-information.use-case.js";
 import type { CandidateProfile } from "../../../domain/entities/candidate-profile.entity.js";
 import { HttpStatus } from "../../../shared/constants/http-status.js";
 
@@ -10,6 +11,7 @@ export interface CandidateProfileControllerDependencies {
   createCandidateProfileUseCase: CreateCandidateProfileUseCase;
   getCandidateProfileUseCase: GetCandidateProfileUseCase;
   updateCandidateProfileUseCase: UpdateCandidateProfileUseCase;
+  updateCandidatePersonalInformationUseCase: UpdateCandidatePersonalInformationUseCase;
   tokenService: ITokenService;
 }
 
@@ -36,6 +38,10 @@ export const createCandidateProfileController = (
     update: wrap(async (req, res) => {
       const profile = await dependencies.updateCandidateProfileUseCase.execute(req.user!.userId, req.body);
       res.status(HttpStatus.OK).json({ message: "Candidate profile updated successfully", profile: toCandidateProfileResponse(profile) });
+    }),
+    updatePersonalInformation: wrap(async (req, res) => {
+      const profile = await dependencies.updateCandidatePersonalInformationUseCase.execute(req.user!.userId, req.body);
+      res.status(HttpStatus.OK).json({ message: "Personal information updated successfully", profile: toCandidateProfileResponse(profile) });
     }),
   };
 };

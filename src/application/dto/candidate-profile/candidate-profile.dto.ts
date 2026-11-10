@@ -24,6 +24,26 @@ export interface CreateCandidateProfileDto {
 
 export type UpdateCandidateProfileDto = Partial<CreateCandidateProfileDto>;
 
+export interface UpdateCandidatePersonalInformationDto {
+  personalInfo?: {
+    dateOfBirth?: string;
+    gender?: string;
+    nationality?: string;
+    maritalStatus?: string;
+  };
+  location?: {
+    city?: string;
+    state?: string;
+    country?: string;
+    postalCode?: string;
+  };
+  contactLinks?: {
+    linkedin?: string;
+    github?: string;
+    portfolio?: string;
+  };
+}
+
 export type CandidateProfileResponseDto = Omit<CandidateProfile, "id"> & {
   _id: string;
 };
