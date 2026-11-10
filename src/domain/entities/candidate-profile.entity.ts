@@ -34,6 +34,15 @@ export interface CandidateProject {
   endDate?: string;
 }
 
+export interface CandidateCertification {
+  name: string;
+  issuingOrganization: string;
+  issueDate?: string;
+  expirationDate?: string;
+  credentialId?: string;
+  credentialUrl?: string;
+}
+
 export class CandidateProfile {
   constructor(
     public readonly id: string | undefined,
@@ -49,7 +58,7 @@ export class CandidateProfile {
     public education: CandidateEducation[],
     public experience: CandidateExperience[],
     public projects: CandidateProject[],
-    public certifications: CandidateProfileItem[],
+    public certifications: CandidateCertification[],
     public languages: CandidateProfileItem[],
     public resume: CandidateProfileJson,
     public jobPreferences: CandidateProfileJson,

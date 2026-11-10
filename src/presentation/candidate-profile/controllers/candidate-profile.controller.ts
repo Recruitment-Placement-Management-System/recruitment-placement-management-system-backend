@@ -16,6 +16,9 @@ import type { DeleteCandidateExperienceUseCase } from "../../../application/use-
 import type { AddCandidateProjectUseCase } from "../../../application/use-cases/candidate-profile/add-candidate-project.use-case.js";
 import type { UpdateCandidateProjectUseCase } from "../../../application/use-cases/candidate-profile/update-candidate-project.use-case.js";
 import type { DeleteCandidateProjectUseCase } from "../../../application/use-cases/candidate-profile/delete-candidate-project.use-case.js";
+import type { AddCandidateCertificationUseCase } from "../../../application/use-cases/candidate-profile/add-candidate-certification.use-case.js";
+import type { UpdateCandidateCertificationUseCase } from "../../../application/use-cases/candidate-profile/update-candidate-certification.use-case.js";
+import type { DeleteCandidateCertificationUseCase } from "../../../application/use-cases/candidate-profile/delete-candidate-certification.use-case.js";
 import type { CandidateProfile } from "../../../domain/entities/candidate-profile.entity.js";
 import { HttpStatus } from "../../../shared/constants/http-status.js";
 
@@ -36,6 +39,9 @@ export interface CandidateProfileControllerDependencies {
   addCandidateProjectUseCase: AddCandidateProjectUseCase;
   updateCandidateProjectUseCase: UpdateCandidateProjectUseCase;
   deleteCandidateProjectUseCase: DeleteCandidateProjectUseCase;
+  addCandidateCertificationUseCase: AddCandidateCertificationUseCase;
+  updateCandidateCertificationUseCase: UpdateCandidateCertificationUseCase;
+  deleteCandidateCertificationUseCase: DeleteCandidateCertificationUseCase;
   tokenService: ITokenService;
 }
 
@@ -129,6 +135,21 @@ export const createCandidateProfileController = (
     deleteProject: wrap(async (req, res) => {
       const profile = await dependencies.deleteCandidateProjectUseCase.execute(req.user!.userId, req.body);
       res.status(HttpStatus.OK).json({ message: "Project deleted successfully", profile: toCandidateProfileResponse(profile) });
+    }),
+
+    addCertification: wrap(async (req, res) => {
+      const profile = await dependencies.addCandidateCertificationUseCase.execute(req.user!.userId, req.body);
+      res.status(HttpStatus.CREATED).json({ message: "Certification added successfully", profile: toCandidateProfileResponse(profile) });
+    }),
+
+    updateCertification: wrap(async (req, res) => {
+      const profile = await dependencies.updateCandidateCertificationUseCase.execute(req.user!.userId, req.body);
+      res.status(HttpStatus.OK).json({ message: "Certification updated successfully", profile: toCandidateProfileResponse(profile) });
+    }),
+
+    deleteCertification: wrap(async (req, res) => {
+      const profile = await dependencies.deleteCandidateCertificationUseCase.execute(req.user!.userId, req.body);
+      res.status(HttpStatus.OK).json({ message: "Certification deleted successfully", profile: toCandidateProfileResponse(profile) });
     }),
   };
 };

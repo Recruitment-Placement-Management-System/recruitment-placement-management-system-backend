@@ -15,6 +15,9 @@ import { DeleteCandidateExperienceUseCase } from "../application/use-cases/candi
 import { AddCandidateProjectUseCase } from "../application/use-cases/candidate-profile/add-candidate-project.use-case.js";
 import { UpdateCandidateProjectUseCase } from "../application/use-cases/candidate-profile/update-candidate-project.use-case.js";
 import { DeleteCandidateProjectUseCase } from "../application/use-cases/candidate-profile/delete-candidate-project.use-case.js";
+import { AddCandidateCertificationUseCase } from "../application/use-cases/candidate-profile/add-candidate-certification.use-case.js";
+import { UpdateCandidateCertificationUseCase } from "../application/use-cases/candidate-profile/update-candidate-certification.use-case.js";
+import { DeleteCandidateCertificationUseCase } from "../application/use-cases/candidate-profile/delete-candidate-certification.use-case.js";
 import { tokenService } from "./container.js";
 
 const candidateProfileRepository = new MongoCandidateProfileRepository();
@@ -36,5 +39,8 @@ export const candidateProfileDependencies = {
   addCandidateProjectUseCase: new AddCandidateProjectUseCase(candidateProfileRepository),
   updateCandidateProjectUseCase: new UpdateCandidateProjectUseCase(candidateProfileRepository),
   deleteCandidateProjectUseCase: new DeleteCandidateProjectUseCase(candidateProfileRepository),
+  addCandidateCertificationUseCase: new AddCandidateCertificationUseCase(candidateProfileRepository),
+  updateCandidateCertificationUseCase: new UpdateCandidateCertificationUseCase(candidateProfileRepository),
+  deleteCandidateCertificationUseCase: new DeleteCandidateCertificationUseCase(candidateProfileRepository),
   tokenService,
 };

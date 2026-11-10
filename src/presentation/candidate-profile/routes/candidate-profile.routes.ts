@@ -5,17 +5,20 @@ import {
   addCandidateEducationSchema,
   addCandidateExperienceSchema,
   addCandidateProjectSchema,
+  addCandidateCertificationSchema,
   createCandidateProfileSchema,
   removeCandidateSkillSchema,
   deleteCandidateEducationSchema,
   deleteCandidateExperienceSchema,
   deleteCandidateProjectSchema,
+  deleteCandidateCertificationSchema,
   updateCandidatePersonalInformationSchema,
   updateCandidateProfileSchema,
   updateCandidateSkillSchema,
   updateCandidateEducationSchema,
   updateCandidateExperienceSchema,
   updateCandidateProjectSchema,
+  updateCandidateCertificationSchema,
 } from "../validators/candidate-profile.validator.js";
 import { createAuthenticate } from "../../middleware/auth.middleware.js";
 import { authorize } from "../../middleware/authorization.middleware.js";
@@ -47,6 +50,10 @@ export const createCandidateProfileRouter = (dependencies: CandidateProfileContr
   router.post("/projects", validate(addCandidateProjectSchema), controller.addProject);
   router.patch("/projects", validate(updateCandidateProjectSchema), controller.updateProject);
   router.delete("/projects", validate(deleteCandidateProjectSchema), controller.deleteProject);
+
+  router.post("/certifications", validate(addCandidateCertificationSchema), controller.addCertification);
+  router.patch("/certifications", validate(updateCandidateCertificationSchema), controller.updateCertification);
+  router.delete("/certifications", validate(deleteCandidateCertificationSchema), controller.deleteCertification);
 
   return router;
 };

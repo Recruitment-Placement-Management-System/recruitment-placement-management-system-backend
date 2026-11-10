@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 const jsonObjectSchema = z.record(z.string(), z.unknown());
-const jsonArraySchema = z.array(jsonObjectSchema);
 const profileItemArraySchema = z.array(z.union([z.string().trim().min(1), jsonObjectSchema]));
 const skillNameSchema = z.string().trim().min(1, "Skill name is required").max(80, "Skill name cannot exceed 80 characters");
 const educationDateSchema = z.union([
@@ -47,6 +46,20 @@ const candidateProjectSchema = z.object({
   (project) => !project.startDate || !project.endDate || project.startDate === "" || project.endDate === "" || project.endDate >= project.startDate,
   { message: "End date must be on or after start date", path: ["endDate"] },
 );
+
+const candidateCertificationFields = {
+  name: z.string().trim().min(1).max(160),
+  issuingOrganization: z.string().trim().min(1).max(160),
+  issueDate: educationDateSchema.optional(),
+  expirationDate: educationDateSchema.optional(),
+  credentialId: z.string().trim().max(160).optional(),
+  credentialUrl: projectUrlSchema.optional(),
+};
+const candidateCertificationSchema = z.object(candidateCertificationFields).strict().refine(
+  (certification) => !certification.issueDate || !certification.expirationDate || certification.issueDate === "" || certification.expirationDate === "" || certification.expirationDate >= certification.issueDate,
+  { message: "Expiration date must be on or after issue date", path: ["expirationDate"] },
+);
+
 const uniqueSkillArraySchema = z.array(skillNameSchema).refine((skills) => {
   const names = skills.map((skill) => skill.toLowerCase());
   return new Set(names).size === names.length;
@@ -64,7 +77,7 @@ export const createCandidateProfileSchema = z.object({
   education: z.array(candidateEducationSchema).optional(),
   experience: z.array(z.lazy(() => candidateExperienceSchema)).optional(),
   projects: z.array(candidateProjectSchema).optional(),
-  certifications: jsonArraySchema.optional(),
+  certifications: z.array(candidateCertificationSchema).optional(),
   languages: profileItemArraySchema.optional(),
   resume: jsonObjectSchema.optional(),
   jobPreferences: jsonObjectSchema.optional(),
@@ -227,5 +240,27 @@ export const updateCandidateProjectSchema = z.object({
 );
 
 export const deleteCandidateProjectSchema = z.object({
+  index: z.number().int().min(0),
+}).strict();
+
+export const addCandidateCertificationSchema = candidateCertificationSchema;
+
+export const updateCandidateCertificationSchema = z.object({
+  index: z.number().int().min(0),
+  name: candidateCertificationFields.name.optional(),
+  issuingOrganization: candidateCertificationFields.issuingOrganization.optional(),
+  issueDate: candidateCertificationFields.issueDate,
+  expirationDate: candidateCertificationFields.expirationDate,
+  credentialId: candidateCertificationFields.credentialId,
+  credentialUrl: candidateCertificationFields.credentialUrl,
+}).strict().refine(
+  (value) => Object.keys(value).some((key) => key !== "index"),
+  "At least one certification field must be provided",
+).refine(
+  (certification) => !certification.issueDate || !certification.expirationDate || certification.issueDate === "" || certification.expirationDate === "" || certification.expirationDate >= certification.issueDate,
+  { message: "Expiration date must be on or after issue date", path: ["expirationDate"] },
+);
+
+export const deleteCandidateCertificationSchema = z.object({
   index: z.number().int().min(0),
 }).strict();
