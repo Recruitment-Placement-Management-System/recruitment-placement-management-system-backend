@@ -18,6 +18,9 @@ import { DeleteCandidateProjectUseCase } from "../application/use-cases/candidat
 import { AddCandidateCertificationUseCase } from "../application/use-cases/candidate-profile/add-candidate-certification.use-case.js";
 import { UpdateCandidateCertificationUseCase } from "../application/use-cases/candidate-profile/update-candidate-certification.use-case.js";
 import { DeleteCandidateCertificationUseCase } from "../application/use-cases/candidate-profile/delete-candidate-certification.use-case.js";
+import { AddCandidateLanguageUseCase } from "../application/use-cases/candidate-profile/add-candidate-language.use-case.js";
+import { UpdateCandidateLanguageProficiencyUseCase } from "../application/use-cases/candidate-profile/update-candidate-language-proficiency.use-case.js";
+import { RemoveCandidateLanguageUseCase } from "../application/use-cases/candidate-profile/remove-candidate-language.use-case.js";
 import { tokenService } from "./container.js";
 
 const candidateProfileRepository = new MongoCandidateProfileRepository();
@@ -42,5 +45,8 @@ export const candidateProfileDependencies = {
   addCandidateCertificationUseCase: new AddCandidateCertificationUseCase(candidateProfileRepository),
   updateCandidateCertificationUseCase: new UpdateCandidateCertificationUseCase(candidateProfileRepository),
   deleteCandidateCertificationUseCase: new DeleteCandidateCertificationUseCase(candidateProfileRepository),
+  addCandidateLanguageUseCase: new AddCandidateLanguageUseCase(candidateProfileRepository),
+  updateCandidateLanguageProficiencyUseCase: new UpdateCandidateLanguageProficiencyUseCase(candidateProfileRepository),
+  removeCandidateLanguageUseCase: new RemoveCandidateLanguageUseCase(candidateProfileRepository),
   tokenService,
 };

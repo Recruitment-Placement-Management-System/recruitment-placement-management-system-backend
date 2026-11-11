@@ -19,6 +19,9 @@ import type { DeleteCandidateProjectUseCase } from "../../../application/use-cas
 import type { AddCandidateCertificationUseCase } from "../../../application/use-cases/candidate-profile/add-candidate-certification.use-case.js";
 import type { UpdateCandidateCertificationUseCase } from "../../../application/use-cases/candidate-profile/update-candidate-certification.use-case.js";
 import type { DeleteCandidateCertificationUseCase } from "../../../application/use-cases/candidate-profile/delete-candidate-certification.use-case.js";
+import type { AddCandidateLanguageUseCase } from "../../../application/use-cases/candidate-profile/add-candidate-language.use-case.js";
+import type { UpdateCandidateLanguageProficiencyUseCase } from "../../../application/use-cases/candidate-profile/update-candidate-language-proficiency.use-case.js";
+import type { RemoveCandidateLanguageUseCase } from "../../../application/use-cases/candidate-profile/remove-candidate-language.use-case.js";
 import type { CandidateProfile } from "../../../domain/entities/candidate-profile.entity.js";
 import { HttpStatus } from "../../../shared/constants/http-status.js";
 
@@ -42,6 +45,9 @@ export interface CandidateProfileControllerDependencies {
   addCandidateCertificationUseCase: AddCandidateCertificationUseCase;
   updateCandidateCertificationUseCase: UpdateCandidateCertificationUseCase;
   deleteCandidateCertificationUseCase: DeleteCandidateCertificationUseCase;
+  addCandidateLanguageUseCase: AddCandidateLanguageUseCase;
+  updateCandidateLanguageProficiencyUseCase: UpdateCandidateLanguageProficiencyUseCase;
+  removeCandidateLanguageUseCase: RemoveCandidateLanguageUseCase;
   tokenService: ITokenService;
 }
 
@@ -150,6 +156,21 @@ export const createCandidateProfileController = (
     deleteCertification: wrap(async (req, res) => {
       const profile = await dependencies.deleteCandidateCertificationUseCase.execute(req.user!.userId, req.body);
       res.status(HttpStatus.OK).json({ message: "Certification deleted successfully", profile: toCandidateProfileResponse(profile) });
+    }),
+
+    addLanguage: wrap(async (req, res) => {
+      const profile = await dependencies.addCandidateLanguageUseCase.execute(req.user!.userId, req.body);
+      res.status(HttpStatus.CREATED).json({ message: "Language added successfully", profile: toCandidateProfileResponse(profile) });
+    }),
+
+    updateLanguageProficiency: wrap(async (req, res) => {
+      const profile = await dependencies.updateCandidateLanguageProficiencyUseCase.execute(req.user!.userId, req.body);
+      res.status(HttpStatus.OK).json({ message: "Language proficiency updated successfully", profile: toCandidateProfileResponse(profile) });
+    }),
+
+    removeLanguage: wrap(async (req, res) => {
+      const profile = await dependencies.removeCandidateLanguageUseCase.execute(req.user!.userId, req.body);
+      res.status(HttpStatus.OK).json({ message: "Language removed successfully", profile: toCandidateProfileResponse(profile) });
     }),
   };
 };

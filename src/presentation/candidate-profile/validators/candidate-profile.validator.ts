@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 const jsonObjectSchema = z.record(z.string(), z.unknown());
-const profileItemArraySchema = z.array(z.union([z.string().trim().min(1), jsonObjectSchema]));
 const skillNameSchema = z.string().trim().min(1, "Skill name is required").max(80, "Skill name cannot exceed 80 characters");
 const educationDateSchema = z.union([
   z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must use YYYY-MM-DD").refine((value) => {
@@ -59,6 +58,11 @@ const candidateCertificationSchema = z.object(candidateCertificationFields).stri
   (certification) => !certification.issueDate || !certification.expirationDate || certification.issueDate === "" || certification.expirationDate === "" || certification.expirationDate >= certification.issueDate,
   { message: "Expiration date must be on or after issue date", path: ["expirationDate"] },
 );
+const candidateLanguageFields = {
+  name: z.string().trim().min(1).max(100),
+  proficiency: z.string().trim().min(1).max(40),
+};
+const candidateLanguageSchema = z.object(candidateLanguageFields).strict();
 
 const uniqueSkillArraySchema = z.array(skillNameSchema).refine((skills) => {
   const names = skills.map((skill) => skill.toLowerCase());
@@ -78,7 +82,7 @@ export const createCandidateProfileSchema = z.object({
   experience: z.array(z.lazy(() => candidateExperienceSchema)).optional(),
   projects: z.array(candidateProjectSchema).optional(),
   certifications: z.array(candidateCertificationSchema).optional(),
-  languages: profileItemArraySchema.optional(),
+  languages: z.array(candidateLanguageSchema).optional(),
   resume: jsonObjectSchema.optional(),
   jobPreferences: jsonObjectSchema.optional(),
 }).strict();
@@ -262,5 +266,16 @@ export const updateCandidateCertificationSchema = z.object({
 );
 
 export const deleteCandidateCertificationSchema = z.object({
+  index: z.number().int().min(0),
+}).strict();
+
+export const addCandidateLanguageSchema = candidateLanguageSchema;
+
+export const updateCandidateLanguageProficiencySchema = z.object({
+  index: z.number().int().min(0),
+  proficiency: candidateLanguageFields.proficiency,
+}).strict();
+
+export const removeCandidateLanguageSchema = z.object({
   index: z.number().int().min(0),
 }).strict();

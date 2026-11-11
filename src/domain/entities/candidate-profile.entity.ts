@@ -43,6 +43,11 @@ export interface CandidateCertification {
   credentialUrl?: string;
 }
 
+export interface CandidateLanguage {
+  name: string;
+  proficiency: string;
+}
+
 export class CandidateProfile {
   constructor(
     public readonly id: string | undefined,
@@ -59,7 +64,7 @@ export class CandidateProfile {
     public experience: CandidateExperience[],
     public projects: CandidateProject[],
     public certifications: CandidateCertification[],
-    public languages: CandidateProfileItem[],
+    public languages: CandidateLanguage[],
     public resume: CandidateProfileJson,
     public jobPreferences: CandidateProfileJson,
     public verificationStatus: CandidateVerificationStatus,
