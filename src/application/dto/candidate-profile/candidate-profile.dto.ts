@@ -1,5 +1,4 @@
 import type {
-  CandidateProfile,
   CandidateEducation,
   CandidateExperience,
   CandidateProject,
@@ -48,6 +47,57 @@ export interface UpdateCandidatePersonalInformationDto {
   };
 }
 
-export type CandidateProfileResponseDto = Omit<CandidateProfile, "id"> & {
+export interface CandidateProfileResponseDto {
   _id: string;
-};
+  userId: string;
+  fullName: string;
+  profilePhoto: string;
+  headline: string;
+  bio: string;
+  location: Record<string, unknown>;
+  personalInfo: Record<string, unknown>;
+  contactLinks: Record<string, unknown>;
+  skills: Array<string | Record<string, unknown>>;
+  education: Array<{
+    institution: string;
+    degree: string;
+    fieldOfStudy?: string;
+    startDate?: string;
+    endDate?: string;
+    grade?: string;
+    description?: string;
+  }>;
+  experience: Array<{
+    companyName: string;
+    jobTitle: string;
+    employmentType?: string;
+    location?: string;
+    startDate: string;
+    endDate?: string;
+    isCurrent: boolean;
+    description?: string;
+  }>;
+  projects: Array<{
+    title: string;
+    description?: string;
+    technologies: string[];
+    projectUrl?: string;
+    repositoryUrl?: string;
+    startDate?: string;
+    endDate?: string;
+  }>;
+  certifications: Array<{
+    name: string;
+    issuingOrganization: string;
+    issueDate?: string;
+    expirationDate?: string;
+    credentialId?: string;
+    credentialUrl?: string;
+  }>;
+  languages: Array<{ name: string; proficiency: string }>;
+  resume: Record<string, unknown>;
+  jobPreferences: Record<string, unknown>;
+  verificationStatus: "pending" | "verified" | "rejected";
+  createdAt: string;
+  updatedAt: string;
+}

@@ -22,8 +22,14 @@ import { AddCandidateLanguageUseCase } from "../application/use-cases/candidate-
 import { UpdateCandidateLanguageProficiencyUseCase } from "../application/use-cases/candidate-profile/update-candidate-language-proficiency.use-case.js";
 import { RemoveCandidateLanguageUseCase } from "../application/use-cases/candidate-profile/remove-candidate-language.use-case.js";
 import { tokenService } from "./container.js";
+import { UploadCandidateProfilePhotoUseCase } from "../application/use-cases/candidate-profile/upload-candidate-profile-photo.use-case.js";
+import { DeleteCandidateProfilePhotoUseCase } from "../application/use-cases/candidate-profile/delete-candidate-profile-photo.use-case.js";
+import { S3FileStorageService } from "../infrastructure/services/s3-file-storage.service.js";
+import { CandidateProfileResponseMapper } from "../presentation/candidate-profile/mappers/candidate-profile-response.mapper.js";
 
 const candidateProfileRepository = new MongoCandidateProfileRepository();
+const fileStorageService = new S3FileStorageService();
+const candidateProfileResponseMapper = new CandidateProfileResponseMapper(fileStorageService);
 
 export const candidateProfileDependencies = {
   createCandidateProfileUseCase: new CreateCandidateProfileUseCase(candidateProfileRepository),
@@ -48,5 +54,8 @@ export const candidateProfileDependencies = {
   addCandidateLanguageUseCase: new AddCandidateLanguageUseCase(candidateProfileRepository),
   updateCandidateLanguageProficiencyUseCase: new UpdateCandidateLanguageProficiencyUseCase(candidateProfileRepository),
   removeCandidateLanguageUseCase: new RemoveCandidateLanguageUseCase(candidateProfileRepository),
+  uploadCandidateProfilePhotoUseCase: new UploadCandidateProfilePhotoUseCase(candidateProfileRepository, fileStorageService),
+  deleteCandidateProfilePhotoUseCase: new DeleteCandidateProfilePhotoUseCase(candidateProfileRepository, fileStorageService),
+  candidateProfileResponseMapper,
   tokenService,
 };

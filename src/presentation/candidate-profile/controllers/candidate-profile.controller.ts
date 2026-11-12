@@ -1,4 +1,4 @@
-import type { RequestHandler } from "express";
+import type { Request, RequestHandler } from "express";
 import type { ITokenService } from "../../../application/interfaces/services/token.service.js";
 import type { CreateCandidateProfileUseCase } from "../../../application/use-cases/candidate-profile/create-candidate-profile.use-case.js";
 import type { GetCandidateProfileUseCase } from "../../../application/use-cases/candidate-profile/get-candidate-profile.use-case.js";
@@ -22,7 +22,9 @@ import type { DeleteCandidateCertificationUseCase } from "../../../application/u
 import type { AddCandidateLanguageUseCase } from "../../../application/use-cases/candidate-profile/add-candidate-language.use-case.js";
 import type { UpdateCandidateLanguageProficiencyUseCase } from "../../../application/use-cases/candidate-profile/update-candidate-language-proficiency.use-case.js";
 import type { RemoveCandidateLanguageUseCase } from "../../../application/use-cases/candidate-profile/remove-candidate-language.use-case.js";
-import type { CandidateProfile } from "../../../domain/entities/candidate-profile.entity.js";
+import type { UploadCandidateProfilePhotoUseCase } from "../../../application/use-cases/candidate-profile/upload-candidate-profile-photo.use-case.js";
+import type { DeleteCandidateProfilePhotoUseCase } from "../../../application/use-cases/candidate-profile/delete-candidate-profile-photo.use-case.js";
+import type { CandidateProfileResponseMapper } from "../mappers/candidate-profile-response.mapper.js";
 import { HttpStatus } from "../../../shared/constants/http-status.js";
 
 export interface CandidateProfileControllerDependencies {
@@ -48,13 +50,14 @@ export interface CandidateProfileControllerDependencies {
   addCandidateLanguageUseCase: AddCandidateLanguageUseCase;
   updateCandidateLanguageProficiencyUseCase: UpdateCandidateLanguageProficiencyUseCase;
   removeCandidateLanguageUseCase: RemoveCandidateLanguageUseCase;
+  uploadCandidateProfilePhotoUseCase: UploadCandidateProfilePhotoUseCase;
+  deleteCandidateProfilePhotoUseCase: DeleteCandidateProfilePhotoUseCase;
+  candidateProfileResponseMapper: CandidateProfileResponseMapper;
   tokenService: ITokenService;
 }
 
-const toCandidateProfileResponse = (profile: CandidateProfile) => {
-  const { id, ...profileFields } = profile;
-  return { _id: id, ...profileFields };
-};
+type CandidateProfileResult = Parameters<CandidateProfileResponseMapper["toDto"]>[0];
+type CandidateProfileAction = (req: Request) => Promise<CandidateProfileResult>;
 
 export const createCandidateProfileController = (
   dependencies: CandidateProfileControllerDependencies,
@@ -62,115 +65,91 @@ export const createCandidateProfileController = (
   const wrap = (handler: RequestHandler): RequestHandler =>
     (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 
+  const withProfileResponse = (
+    status: number,
+    message: string,
+    action: CandidateProfileAction,
+  ): RequestHandler => wrap(async (req, res) => {
+    const profile = await action(req);
+    const profileDto = await dependencies.candidateProfileResponseMapper.toDto(profile);
+    res.status(status).json({ message, profile: profileDto });
+  });
+
   return {
-    create: wrap(async (req, res) => {
-      const profile = await dependencies.createCandidateProfileUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.CREATED).json({ message: "Candidate profile created successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    create: withProfileResponse(HttpStatus.CREATED, "Candidate profile created successfully", (req) =>
+      dependencies.createCandidateProfileUseCase.execute(req.user!.userId, req.body)),
 
-    get: wrap(async (req, res) => {
-      const profile = await dependencies.getCandidateProfileUseCase.execute(req.user!.userId);
-      res.status(HttpStatus.OK).json({ message: "Candidate profile retrieved successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    get: withProfileResponse(HttpStatus.OK, "Candidate profile retrieved successfully", (req) =>
+      dependencies.getCandidateProfileUseCase.execute(req.user!.userId)),
 
-    update: wrap(async (req, res) => {
-      const profile = await dependencies.updateCandidateProfileUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.OK).json({ message: "Candidate profile updated successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    update: withProfileResponse(HttpStatus.OK, "Candidate profile updated successfully", (req) =>
+      dependencies.updateCandidateProfileUseCase.execute(req.user!.userId, req.body)),
 
-    updatePersonalInformation: wrap(async (req, res) => {
-      const profile = await dependencies.updateCandidatePersonalInformationUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.OK).json({ message: "Personal information updated successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    updatePersonalInformation: withProfileResponse(HttpStatus.OK, "Personal information updated successfully", (req) =>
+      dependencies.updateCandidatePersonalInformationUseCase.execute(req.user!.userId, req.body)),
 
-    addSkills: wrap(async (req, res) => {
-      const profile = await dependencies.addCandidateSkillsUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.OK).json({ message: "Skills added successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    addSkills: withProfileResponse(HttpStatus.OK, "Skills added successfully", (req) =>
+      dependencies.addCandidateSkillsUseCase.execute(req.user!.userId, req.body)),
 
-    updateSkill: wrap(async (req, res) => {
-      const profile = await dependencies.updateCandidateSkillUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.OK).json({ message: "Skill updated successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    updateSkill: withProfileResponse(HttpStatus.OK, "Skill updated successfully", (req) =>
+      dependencies.updateCandidateSkillUseCase.execute(req.user!.userId, req.body)),
 
-    removeSkill: wrap(async (req, res) => {
-      const profile = await dependencies.removeCandidateSkillUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.OK).json({ message: "Skill removed successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    removeSkill: withProfileResponse(HttpStatus.OK, "Skill removed successfully", (req) =>
+      dependencies.removeCandidateSkillUseCase.execute(req.user!.userId, req.body)),
 
-    addEducation: wrap(async (req, res) => {
-      const profile = await dependencies.addCandidateEducationUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.CREATED).json({ message: "Education added successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    addEducation: withProfileResponse(HttpStatus.CREATED, "Education added successfully", (req) =>
+      dependencies.addCandidateEducationUseCase.execute(req.user!.userId, req.body)),
 
-    updateEducation: wrap(async (req, res) => {
-      const profile = await dependencies.updateCandidateEducationUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.OK).json({ message: "Education updated successfully", profile: toCandidateProfileResponse(profile) });
-    }),
-    
-    deleteEducation: wrap(async (req, res) => {
-      const profile = await dependencies.deleteCandidateEducationUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.OK).json({ message: "Education deleted successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    updateEducation: withProfileResponse(HttpStatus.OK, "Education updated successfully", (req) =>
+      dependencies.updateCandidateEducationUseCase.execute(req.user!.userId, req.body)),
 
-    addExperience: wrap(async (req, res) => {
-      const profile = await dependencies.addCandidateExperienceUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.CREATED).json({ message: "Work experience added successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    deleteEducation: withProfileResponse(HttpStatus.OK, "Education deleted successfully", (req) =>
+      dependencies.deleteCandidateEducationUseCase.execute(req.user!.userId, req.body)),
 
-    updateExperience: wrap(async (req, res) => {
-      const profile = await dependencies.updateCandidateExperienceUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.OK).json({ message: "Work experience updated successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    addExperience: withProfileResponse(HttpStatus.CREATED, "Work experience added successfully", (req) =>
+      dependencies.addCandidateExperienceUseCase.execute(req.user!.userId, req.body)),
 
-    deleteExperience: wrap(async (req, res) => {
-      const profile = await dependencies.deleteCandidateExperienceUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.OK).json({ message: "Work experience deleted successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    updateExperience: withProfileResponse(HttpStatus.OK, "Work experience updated successfully", (req) =>
+      dependencies.updateCandidateExperienceUseCase.execute(req.user!.userId, req.body)),
 
-    addProject: wrap(async (req, res) => {
-      const profile = await dependencies.addCandidateProjectUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.CREATED).json({ message: "Project added successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    deleteExperience: withProfileResponse(HttpStatus.OK, "Work experience deleted successfully", (req) =>
+      dependencies.deleteCandidateExperienceUseCase.execute(req.user!.userId, req.body)),
 
-    updateProject: wrap(async (req, res) => {
-      const profile = await dependencies.updateCandidateProjectUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.OK).json({ message: "Project updated successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    addProject: withProfileResponse(HttpStatus.CREATED, "Project added successfully", (req) =>
+      dependencies.addCandidateProjectUseCase.execute(req.user!.userId, req.body)),
 
-    deleteProject: wrap(async (req, res) => {
-      const profile = await dependencies.deleteCandidateProjectUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.OK).json({ message: "Project deleted successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    updateProject: withProfileResponse(HttpStatus.OK, "Project updated successfully", (req) =>
+      dependencies.updateCandidateProjectUseCase.execute(req.user!.userId, req.body)),
 
-    addCertification: wrap(async (req, res) => {
-      const profile = await dependencies.addCandidateCertificationUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.CREATED).json({ message: "Certification added successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    deleteProject: withProfileResponse(HttpStatus.OK, "Project deleted successfully", (req) =>
+      dependencies.deleteCandidateProjectUseCase.execute(req.user!.userId, req.body)),
 
-    updateCertification: wrap(async (req, res) => {
-      const profile = await dependencies.updateCandidateCertificationUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.OK).json({ message: "Certification updated successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    addCertification: withProfileResponse(HttpStatus.CREATED, "Certification added successfully", (req) =>
+      dependencies.addCandidateCertificationUseCase.execute(req.user!.userId, req.body)),
 
-    deleteCertification: wrap(async (req, res) => {
-      const profile = await dependencies.deleteCandidateCertificationUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.OK).json({ message: "Certification deleted successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    updateCertification: withProfileResponse(HttpStatus.OK, "Certification updated successfully", (req) =>
+      dependencies.updateCandidateCertificationUseCase.execute(req.user!.userId, req.body)),
 
-    addLanguage: wrap(async (req, res) => {
-      const profile = await dependencies.addCandidateLanguageUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.CREATED).json({ message: "Language added successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    deleteCertification: withProfileResponse(HttpStatus.OK, "Certification deleted successfully", (req) =>
+      dependencies.deleteCandidateCertificationUseCase.execute(req.user!.userId, req.body)),
 
-    updateLanguageProficiency: wrap(async (req, res) => {
-      const profile = await dependencies.updateCandidateLanguageProficiencyUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.OK).json({ message: "Language proficiency updated successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    addLanguage: withProfileResponse(HttpStatus.CREATED, "Language added successfully", (req) =>
+      dependencies.addCandidateLanguageUseCase.execute(req.user!.userId, req.body)),
 
-    removeLanguage: wrap(async (req, res) => {
-      const profile = await dependencies.removeCandidateLanguageUseCase.execute(req.user!.userId, req.body);
-      res.status(HttpStatus.OK).json({ message: "Language removed successfully", profile: toCandidateProfileResponse(profile) });
-    }),
+    updateLanguageProficiency: withProfileResponse(HttpStatus.OK, "Language proficiency updated successfully", (req) =>
+      dependencies.updateCandidateLanguageProficiencyUseCase.execute(req.user!.userId, req.body)),
+
+    removeLanguage: withProfileResponse(HttpStatus.OK, "Language removed successfully", (req) =>
+      dependencies.removeCandidateLanguageUseCase.execute(req.user!.userId, req.body)),
+
+    uploadProfilePhoto: withProfileResponse(HttpStatus.OK, "Profile photo uploaded successfully", (req) =>
+      dependencies.uploadCandidateProfilePhotoUseCase.execute(req.user!.userId, {
+        buffer: req.file!.buffer,
+        contentType: req.file!.mimetype,
+      })),
+
+    deleteProfilePhoto: withProfileResponse(HttpStatus.OK, "Profile photo deleted successfully", (req) =>
+      dependencies.deleteCandidateProfilePhotoUseCase.execute(req.user!.userId)),
+
   };
 };

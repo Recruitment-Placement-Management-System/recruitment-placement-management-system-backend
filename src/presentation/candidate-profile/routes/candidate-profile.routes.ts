@@ -26,6 +26,7 @@ import {
 import { createAuthenticate } from "../../middleware/auth.middleware.js";
 import { authorize } from "../../middleware/authorization.middleware.js";
 import { validate } from "../../middleware/validate.js";
+import { uploadCandidateProfilePhoto } from "../middleware/candidate-profile-photo-upload.middleware.js";
 
 export const createCandidateProfileRouter = (dependencies: CandidateProfileControllerDependencies) => {
   const router = Router();
@@ -35,6 +36,9 @@ export const createCandidateProfileRouter = (dependencies: CandidateProfileContr
   router.post("/", validate(createCandidateProfileSchema), controller.create);
   router.get("/", controller.get);
   router.patch("/", validate(updateCandidateProfileSchema), controller.update);
+
+  router.post("/photo", uploadCandidateProfilePhoto, controller.uploadProfilePhoto);
+  router.delete("/photo", controller.deleteProfilePhoto);
 
   router.patch("/personal-information", validate(updateCandidatePersonalInformationSchema), controller.updatePersonalInformation);
   
