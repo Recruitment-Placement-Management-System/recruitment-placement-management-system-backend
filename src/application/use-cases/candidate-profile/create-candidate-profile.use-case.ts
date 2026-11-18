@@ -29,7 +29,7 @@ export class CreateCandidateProfileUseCase {
       input.projects ?? [],
       input.certifications ?? [],
       input.languages ?? [],
-      input.resume ?? {},
+      null,
       input.jobPreferences ?? {},
       "pending",
     ));

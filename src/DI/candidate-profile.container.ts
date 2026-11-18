@@ -26,6 +26,9 @@ import { UploadCandidateProfilePhotoUseCase } from "../application/use-cases/can
 import { DeleteCandidateProfilePhotoUseCase } from "../application/use-cases/candidate-profile/delete-candidate-profile-photo.use-case.js";
 import { S3FileStorageService } from "../infrastructure/services/s3-file-storage.service.js";
 import { CandidateProfileResponseMapper } from "../presentation/candidate-profile/mappers/candidate-profile-response.mapper.js";
+import { UploadCandidateResumeUseCase } from "../application/use-cases/candidate-profile/upload-candidate-resume.use-case.js";
+import { GetCandidateResumeUseCase } from "../application/use-cases/candidate-profile/get-candidate-resume.use-case.js";
+import { DeleteCandidateResumeUseCase } from "../application/use-cases/candidate-profile/delete-candidate-resume.use-case.js";
 
 const candidateProfileRepository = new MongoCandidateProfileRepository();
 const fileStorageService = new S3FileStorageService();
@@ -56,6 +59,9 @@ export const candidateProfileDependencies = {
   removeCandidateLanguageUseCase: new RemoveCandidateLanguageUseCase(candidateProfileRepository),
   uploadCandidateProfilePhotoUseCase: new UploadCandidateProfilePhotoUseCase(candidateProfileRepository, fileStorageService),
   deleteCandidateProfilePhotoUseCase: new DeleteCandidateProfilePhotoUseCase(candidateProfileRepository, fileStorageService),
+  uploadCandidateResumeUseCase: new UploadCandidateResumeUseCase(candidateProfileRepository, fileStorageService),
+  getCandidateResumeUseCase: new GetCandidateResumeUseCase(candidateProfileRepository),
+  deleteCandidateResumeUseCase: new DeleteCandidateResumeUseCase(candidateProfileRepository, fileStorageService),
   candidateProfileResponseMapper,
   tokenService,
 };

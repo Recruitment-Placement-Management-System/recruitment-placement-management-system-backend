@@ -24,6 +24,9 @@ import type { UpdateCandidateLanguageProficiencyUseCase } from "../../../applica
 import type { RemoveCandidateLanguageUseCase } from "../../../application/use-cases/candidate-profile/remove-candidate-language.use-case.js";
 import type { UploadCandidateProfilePhotoUseCase } from "../../../application/use-cases/candidate-profile/upload-candidate-profile-photo.use-case.js";
 import type { DeleteCandidateProfilePhotoUseCase } from "../../../application/use-cases/candidate-profile/delete-candidate-profile-photo.use-case.js";
+import type { UploadCandidateResumeUseCase } from "../../../application/use-cases/candidate-profile/upload-candidate-resume.use-case.js";
+import type { GetCandidateResumeUseCase } from "../../../application/use-cases/candidate-profile/get-candidate-resume.use-case.js";
+import type { DeleteCandidateResumeUseCase } from "../../../application/use-cases/candidate-profile/delete-candidate-resume.use-case.js";
 import type { CandidateProfileResponseMapper } from "../mappers/candidate-profile-response.mapper.js";
 import { HttpStatus } from "../../../shared/constants/http-status.js";
 
@@ -52,6 +55,9 @@ export interface CandidateProfileControllerDependencies {
   removeCandidateLanguageUseCase: RemoveCandidateLanguageUseCase;
   uploadCandidateProfilePhotoUseCase: UploadCandidateProfilePhotoUseCase;
   deleteCandidateProfilePhotoUseCase: DeleteCandidateProfilePhotoUseCase;
+  uploadCandidateResumeUseCase: UploadCandidateResumeUseCase;
+  getCandidateResumeUseCase: GetCandidateResumeUseCase;
+  deleteCandidateResumeUseCase: DeleteCandidateResumeUseCase;
   candidateProfileResponseMapper: CandidateProfileResponseMapper;
   tokenService: ITokenService;
 }
@@ -151,5 +157,21 @@ export const createCandidateProfileController = (
     deleteProfilePhoto: withProfileResponse(HttpStatus.OK, "Profile photo deleted successfully", (req) =>
       dependencies.deleteCandidateProfilePhotoUseCase.execute(req.user!.userId)),
 
+    uploadResume: withProfileResponse(HttpStatus.OK, "Resume uploaded successfully", (req) =>
+      dependencies.uploadCandidateResumeUseCase.execute(req.user!.userId, {
+        buffer: req.file!.buffer,
+        contentType: req.file!.mimetype as "application/pdf" | "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        fileName: req.file!.originalname,
+        fileSize: req.file!.size,
+      })),
+
+    getResume: wrap(async (req, res) => {
+      const resume = await dependencies.getCandidateResumeUseCase.execute(req.user!.userId);
+      const resumeDto = await dependencies.candidateProfileResponseMapper.toResumeDto(resume);
+      res.status(HttpStatus.OK).json({ message: "Resume details retrieved successfully", resume: resumeDto });
+    }),
+
+    deleteResume: withProfileResponse(HttpStatus.OK, "Resume deleted successfully", (req) =>
+      dependencies.deleteCandidateResumeUseCase.execute(req.user!.userId)),
   };
 };

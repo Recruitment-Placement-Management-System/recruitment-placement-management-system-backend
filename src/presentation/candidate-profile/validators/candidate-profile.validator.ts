@@ -83,7 +83,6 @@ export const createCandidateProfileSchema = z.object({
   projects: z.array(candidateProjectSchema).optional(),
   certifications: z.array(candidateCertificationSchema).optional(),
   languages: z.array(candidateLanguageSchema).optional(),
-  resume: jsonObjectSchema.optional(),
   jobPreferences: jsonObjectSchema.optional(),
 }).strict();
 

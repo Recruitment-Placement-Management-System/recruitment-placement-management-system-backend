@@ -21,7 +21,6 @@ export interface CreateCandidateProfileDto {
   projects?: CandidateProject[];
   certifications?: CandidateCertification[];
   languages?: CandidateLanguage[];
-  resume?: CandidateProfileJson;
   jobPreferences?: CandidateProfileJson; 
 }
 
@@ -95,9 +94,18 @@ export interface CandidateProfileResponseDto {
     credentialUrl?: string;
   }>;
   languages: Array<{ name: string; proficiency: string }>;
-  resume: Record<string, unknown>;
+  resume: CandidateResumeResponseDto | null;
   jobPreferences: Record<string, unknown>;
   verificationStatus: "pending" | "verified" | "rejected";
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CandidateResumeResponseDto {
+  fileName: string;
+  contentType: string;
+  fileSize: number;
+  uploadedAt: string;
+  parsingStatus: "pending" | "processing" | "completed" | "failed";
+  downloadUrl: string;
 }

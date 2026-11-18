@@ -7,6 +7,7 @@ import type {
   CandidateProject,
   CandidateCertification,
   CandidateLanguage,
+  CandidateResume,
   CandidateVerificationStatus,
 } from "../../../domain/entities/candidate-profile.entity.js";
 
@@ -25,7 +26,7 @@ export interface CandidateProfileDocument extends Document {
   projects: CandidateProject[];
   certifications: CandidateCertification[];
   languages: CandidateLanguage[];
-  resume: CandidateProfileJson;
+  resume: CandidateResume | null;
   jobPreferences: CandidateProfileJson;
   verificationStatus: CandidateVerificationStatus;
   createdAt: Date;
@@ -79,7 +80,7 @@ const candidateProfileSchema = new Schema<CandidateProfileDocument>(
     projects: projectArray,
     certifications: certificationArray,
     languages: languageArray,
-    resume: jsonObject,
+    resume: { type: Schema.Types.Mixed, default: null },
     jobPreferences: jsonObject,
     verificationStatus: {
       type: String,

@@ -1,6 +1,6 @@
-import type { CandidateProfileResponseDto } from "../../../application/dto/candidate-profile/candidate-profile.dto.js";
+import type { CandidateProfileResponseDto, CandidateResumeResponseDto } from "../../../application/dto/candidate-profile/candidate-profile.dto.js";
 import type { IFileStorageService } from "../../../application/interfaces/services/file-storage.service.js";
-import type { CandidateProfile } from "../../../domain/entities/candidate-profile.entity.js";
+import type { CandidateProfile, CandidateResume } from "../../../domain/entities/candidate-profile.entity.js";
 
 export class CandidateProfileResponseMapper {
   constructor(private readonly fileStorage: IFileStorageService) {}
@@ -26,11 +26,23 @@ export class CandidateProfileResponseMapper {
       projects: profile.projects.map((item) => ({ ...item, technologies: [...item.technologies] })),
       certifications: profile.certifications.map((item) => ({ ...item })),
       languages: profile.languages.map((item) => ({ ...item })),
-      resume: { ...profile.resume },
+      resume: await this.toResumeDto(profile.resume),
       jobPreferences: { ...profile.jobPreferences },
       verificationStatus: profile.verificationStatus,
       createdAt: profile.createdAt.toISOString(),
       updatedAt: profile.updatedAt.toISOString(),
+    };
+  }
+
+  async  toResumeDto(resume: CandidateResume | null): Promise<CandidateResumeResponseDto | null> {
+    if (!resume) return null;
+    return {
+      fileName: resume.fileName,
+      contentType: resume.contentType,
+      fileSize: resume.fileSize,
+      uploadedAt: resume.uploadedAt,
+      parsingStatus: resume.parsingStatus,
+      downloadUrl: await this.fileStorage.getDownloadUrl(resume.storageKey),
     };
   }
 }

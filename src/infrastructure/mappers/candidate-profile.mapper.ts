@@ -19,7 +19,7 @@ export class CandidateProfileMapper {
       document.projects,
       document.certifications,
       document.languages,
-      document.resume,
+      document.resume && typeof document.resume.storageKey === "string" ? document.resume : null,
       document.jobPreferences,
       document.verificationStatus,
       document.createdAt,

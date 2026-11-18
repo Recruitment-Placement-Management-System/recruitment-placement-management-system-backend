@@ -2,6 +2,16 @@ export type CandidateVerificationStatus = "pending" | "verified" | "rejected";
 
 export type CandidateProfileJson = Record<string, unknown>;
 export type CandidateProfileItem = string | CandidateProfileJson;
+export type CandidateResumeParsingStatus = "pending" | "processing" | "completed" | "failed";
+
+export interface CandidateResume {
+  storageKey: string;
+  fileName: string;
+  contentType: string;
+  fileSize: number;
+  uploadedAt: string;
+  parsingStatus: CandidateResumeParsingStatus;
+}
 
 export interface CandidateEducation {
   institution: string;
@@ -65,7 +75,7 @@ export class CandidateProfile {
     public projects: CandidateProject[],
     public certifications: CandidateCertification[],
     public languages: CandidateLanguage[],
-    public resume: CandidateProfileJson,
+    public resume: CandidateResume | null,
     public jobPreferences: CandidateProfileJson,
     public verificationStatus: CandidateVerificationStatus,
     public readonly createdAt: Date = new Date(),
