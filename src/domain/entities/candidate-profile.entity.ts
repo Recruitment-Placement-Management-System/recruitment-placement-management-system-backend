@@ -13,6 +13,36 @@ export interface CandidateResume {
   parsingStatus: CandidateResumeParsingStatus;
 }
 
+export type CandidateEmploymentType = "full_time" | "part_time" | "contract" | "internship" | "temporary" | "freelance";
+export type CandidateWorkMode = "remote" | "hybrid" | "onsite";
+export type CandidateExperienceLevel = "internship" | "entry" | "junior" | "mid" | "senior" | "lead" | "executive";
+
+export interface CandidateExpectedSalary {
+  minimum: number | null;
+  maximum: number | null;
+  currency: string | null;
+}
+
+export interface CandidateJobPreferences {
+  preferredRoles: string[];
+  preferredLocations: string[];
+  employmentTypes: CandidateEmploymentType[];
+  workModes: CandidateWorkMode[];
+  expectedSalary: CandidateExpectedSalary | null;
+  experienceLevel: CandidateExperienceLevel | null;
+  noticePeriodDays: number | null;
+}
+
+export const createEmptyCandidateJobPreferences = (): CandidateJobPreferences => ({
+  preferredRoles: [],
+  preferredLocations: [],
+  employmentTypes: [],
+  workModes: [],
+  expectedSalary: null,
+  experienceLevel: null,
+  noticePeriodDays: null,
+});
+
 export interface CandidateEducation {
   institution: string;
   degree: string;
@@ -76,7 +106,7 @@ export class CandidateProfile {
     public certifications: CandidateCertification[],
     public languages: CandidateLanguage[],
     public resume: CandidateResume | null,
-    public jobPreferences: CandidateProfileJson,
+    public jobPreferences: CandidateJobPreferences,
     public verificationStatus: CandidateVerificationStatus,
     public readonly createdAt: Date = new Date(),
     public updatedAt: Date = new Date(),

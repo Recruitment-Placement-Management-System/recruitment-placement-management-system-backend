@@ -29,6 +29,7 @@ import { CandidateProfileResponseMapper } from "../presentation/candidate-profil
 import { UploadCandidateResumeUseCase } from "../application/use-cases/candidate-profile/upload-candidate-resume.use-case.js";
 import { GetCandidateResumeUseCase } from "../application/use-cases/candidate-profile/get-candidate-resume.use-case.js";
 import { DeleteCandidateResumeUseCase } from "../application/use-cases/candidate-profile/delete-candidate-resume.use-case.js";
+import { UpdateCandidateJobPreferencesUseCase } from "../application/use-cases/candidate-profile/update-candidate-job-preferences.use-case.js";
 
 const candidateProfileRepository = new MongoCandidateProfileRepository();
 const fileStorageService = new S3FileStorageService();
@@ -62,6 +63,7 @@ export const candidateProfileDependencies = {
   uploadCandidateResumeUseCase: new UploadCandidateResumeUseCase(candidateProfileRepository, fileStorageService),
   getCandidateResumeUseCase: new GetCandidateResumeUseCase(candidateProfileRepository),
   deleteCandidateResumeUseCase: new DeleteCandidateResumeUseCase(candidateProfileRepository, fileStorageService),
+  updateCandidateJobPreferencesUseCase: new UpdateCandidateJobPreferencesUseCase(candidateProfileRepository),
   candidateProfileResponseMapper,
   tokenService,
 };

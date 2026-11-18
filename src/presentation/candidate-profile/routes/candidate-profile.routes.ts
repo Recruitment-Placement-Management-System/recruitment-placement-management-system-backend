@@ -22,6 +22,7 @@ import {
   updateCandidateProjectSchema,
   updateCandidateCertificationSchema,
   updateCandidateLanguageProficiencySchema,
+  updateCandidateJobPreferencesSchema,
 } from "../validators/candidate-profile.validator.js";
 import { createAuthenticate } from "../../middleware/auth.middleware.js";
 import { authorize } from "../../middleware/authorization.middleware.js";
@@ -44,6 +45,8 @@ export const createCandidateProfileRouter = (dependencies: CandidateProfileContr
   router.post("/resume", uploadCandidateResume, controller.uploadResume);
   router.get("/resume", controller.getResume);
   router.delete("/resume", controller.deleteResume);
+
+  router.patch("/job-preferences", validate(updateCandidateJobPreferencesSchema), controller.updateJobPreferences);
 
   router.patch("/personal-information", validate(updateCandidatePersonalInformationSchema), controller.updatePersonalInformation);
   

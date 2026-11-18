@@ -83,7 +83,6 @@ export const createCandidateProfileSchema = z.object({
   projects: z.array(candidateProjectSchema).optional(),
   certifications: z.array(candidateCertificationSchema).optional(),
   languages: z.array(candidateLanguageSchema).optional(),
-  jobPreferences: jsonObjectSchema.optional(),
 }).strict();
 
 export const updateCandidateProfileSchema = createCandidateProfileSchema
@@ -133,6 +132,40 @@ export const updateCandidatePersonalInformationSchema = z.object({
 }).strict().refine(
   (value) => Object.values(value).some((section) => section && Object.keys(section).length > 0),
   "At least one personal information field must be provided",
+);
+
+const preferenceTextArray = (maximum: number, itemMaximum: number) =>
+  z.array(z.string().trim().min(1).max(itemMaximum)).max(maximum).refine(
+    (values) => new Set(values.map((value) => value.toLowerCase())).size === values.length,
+    "Values must not contain duplicates",
+  );
+
+const employmentTypeSchema = z.enum(["full_time", "part_time", "contract", "internship", "temporary", "freelance"]);
+const workModeSchema = z.enum(["remote", "hybrid", "onsite"]);
+const experienceLevelSchema = z.enum(["internship", "entry", "junior", "mid", "senior", "lead", "executive"]);
+const salaryCurrencySchema = z.string().trim().toUpperCase().regex(/^[A-Z]{3}$/, "Currency must be a 3-letter ISO code");
+
+export const updateCandidateJobPreferencesSchema = z.object({
+  preferredRoles: preferenceTextArray(30, 120).optional(),
+  preferredLocations: preferenceTextArray(30, 120).optional(),
+  employmentTypes: z.array(employmentTypeSchema).max(6).refine((values) => new Set(values).size === values.length, "Employment types must not contain duplicates").optional(),
+  workModes: z.array(workModeSchema).max(3).refine((values) => new Set(values).size === values.length, "Work modes must not contain duplicates").optional(),
+  expectedSalary: z.object({
+    minimum: z.number().finite().nonnegative().max(1_000_000_000).nullable().optional(),
+    maximum: z.number().finite().nonnegative().max(1_000_000_000).nullable().optional(),
+    currency: salaryCurrencySchema.nullable().optional(),
+  }).strict().nullable().optional(),
+  experienceLevel: experienceLevelSchema.nullable().optional(),
+  noticePeriodDays: z.number().int().min(0).max(365).nullable().optional(),
+}).strict().refine(
+  (value) => Object.keys(value).length > 0,
+  "At least one job preference must be provided",
+).refine(
+  (value) => value.expectedSalary === null
+    || value.expectedSalary?.minimum == null
+    || value.expectedSalary.maximum == null
+    || value.expectedSalary.minimum <= value.expectedSalary.maximum,
+  { message: "Minimum salary cannot exceed maximum salary", path: ["expectedSalary", "maximum"] },
 );
 
 export const addCandidateSkillsSchema = z.object({

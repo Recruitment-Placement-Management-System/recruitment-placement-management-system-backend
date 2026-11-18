@@ -6,6 +6,7 @@ import type {
   CandidateLanguage,
   CandidateProfileJson,
 } from "../../../domain/entities/candidate-profile.entity.js";
+import type { CandidateJobPreferencesResponseDto } from "./candidate-job-preferences.dto.js";
 
 export interface CreateCandidateProfileDto {
   fullName?: string;
@@ -21,7 +22,6 @@ export interface CreateCandidateProfileDto {
   projects?: CandidateProject[];
   certifications?: CandidateCertification[];
   languages?: CandidateLanguage[];
-  jobPreferences?: CandidateProfileJson; 
 }
 
 export type UpdateCandidateProfileDto = Partial<CreateCandidateProfileDto>;
@@ -95,7 +95,7 @@ export interface CandidateProfileResponseDto {
   }>;
   languages: Array<{ name: string; proficiency: string }>;
   resume: CandidateResumeResponseDto | null;
-  jobPreferences: Record<string, unknown>;
+  jobPreferences: CandidateJobPreferencesResponseDto;
   verificationStatus: "pending" | "verified" | "rejected";
   createdAt: string;
   updatedAt: string;

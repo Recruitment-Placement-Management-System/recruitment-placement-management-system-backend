@@ -27,6 +27,7 @@ import type { DeleteCandidateProfilePhotoUseCase } from "../../../application/us
 import type { UploadCandidateResumeUseCase } from "../../../application/use-cases/candidate-profile/upload-candidate-resume.use-case.js";
 import type { GetCandidateResumeUseCase } from "../../../application/use-cases/candidate-profile/get-candidate-resume.use-case.js";
 import type { DeleteCandidateResumeUseCase } from "../../../application/use-cases/candidate-profile/delete-candidate-resume.use-case.js";
+import type { UpdateCandidateJobPreferencesUseCase } from "../../../application/use-cases/candidate-profile/update-candidate-job-preferences.use-case.js";
 import type { CandidateProfileResponseMapper } from "../mappers/candidate-profile-response.mapper.js";
 import { HttpStatus } from "../../../shared/constants/http-status.js";
 
@@ -58,6 +59,7 @@ export interface CandidateProfileControllerDependencies {
   uploadCandidateResumeUseCase: UploadCandidateResumeUseCase;
   getCandidateResumeUseCase: GetCandidateResumeUseCase;
   deleteCandidateResumeUseCase: DeleteCandidateResumeUseCase;
+  updateCandidateJobPreferencesUseCase: UpdateCandidateJobPreferencesUseCase;
   candidateProfileResponseMapper: CandidateProfileResponseMapper;
   tokenService: ITokenService;
 }
@@ -173,5 +175,8 @@ export const createCandidateProfileController = (
 
     deleteResume: withProfileResponse(HttpStatus.OK, "Resume deleted successfully", (req) =>
       dependencies.deleteCandidateResumeUseCase.execute(req.user!.userId)),
+
+    updateJobPreferences: withProfileResponse(HttpStatus.OK, "Job preferences updated successfully", (req) =>
+      dependencies.updateCandidateJobPreferencesUseCase.execute(req.user!.userId, req.body)),
   };
 };

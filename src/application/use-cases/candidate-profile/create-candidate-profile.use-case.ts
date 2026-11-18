@@ -1,7 +1,7 @@
 import type { CreateCandidateProfileDto } from "../../dto/candidate-profile/candidate-profile.dto.js";
 import { AppError } from "../../errors/app-error.js";
 import type { ICandidateProfileRepository } from "../../interfaces/repositories/candidate-profile.repository.js";
-import { CandidateProfile } from "../../../domain/entities/candidate-profile.entity.js";
+import { CandidateProfile, createEmptyCandidateJobPreferences } from "../../../domain/entities/candidate-profile.entity.js";
 import { HttpStatus } from "../../../shared/constants/http-status.js";
 
 export class CreateCandidateProfileUseCase {
@@ -30,7 +30,7 @@ export class CreateCandidateProfileUseCase {
       input.certifications ?? [],
       input.languages ?? [],
       null,
-      input.jobPreferences ?? {},
+      createEmptyCandidateJobPreferences(),
       "pending",
     ));
   }

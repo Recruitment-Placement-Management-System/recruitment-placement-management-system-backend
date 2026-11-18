@@ -8,6 +8,7 @@ import type {
   CandidateCertification,
   CandidateLanguage,
   CandidateResume,
+  CandidateJobPreferences,
   CandidateVerificationStatus,
 } from "../../../domain/entities/candidate-profile.entity.js";
 
@@ -27,7 +28,7 @@ export interface CandidateProfileDocument extends Document {
   certifications: CandidateCertification[];
   languages: CandidateLanguage[];
   resume: CandidateResume | null;
-  jobPreferences: CandidateProfileJson;
+  jobPreferences: CandidateJobPreferences;
   verificationStatus: CandidateVerificationStatus;
   createdAt: Date;
   updatedAt: Date;
@@ -81,7 +82,18 @@ const candidateProfileSchema = new Schema<CandidateProfileDocument>(
     certifications: certificationArray,
     languages: languageArray,
     resume: { type: Schema.Types.Mixed, default: null },
-    jobPreferences: jsonObject,
+    jobPreferences: {
+      type: Schema.Types.Mixed,
+      default: () => ({
+        preferredRoles: [],
+        preferredLocations: [],
+        employmentTypes: [],
+        workModes: [],
+        expectedSalary: null,
+        experienceLevel: null,
+        noticePeriodDays: null,
+      }),
+    },
     verificationStatus: {
       type: String,
       enum: ["pending", "verified", "rejected"],

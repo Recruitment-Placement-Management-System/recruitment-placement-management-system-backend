@@ -1,4 +1,4 @@
-import { CandidateProfile } from "../../domain/entities/candidate-profile.entity.js";
+import { CandidateProfile, createEmptyCandidateJobPreferences } from "../../domain/entities/candidate-profile.entity.js";
 import type { CandidateProfileDocument } from "../database/models/candidate-profile.model.js";
 
 export class CandidateProfileMapper {
@@ -20,7 +20,11 @@ export class CandidateProfileMapper {
       document.certifications,
       document.languages,
       document.resume && typeof document.resume.storageKey === "string" ? document.resume : null,
-      document.jobPreferences,
+      {
+        ...createEmptyCandidateJobPreferences(),
+        ...document.jobPreferences,
+        expectedSalary: document.jobPreferences?.expectedSalary ?? null,
+      },
       document.verificationStatus,
       document.createdAt,
       document.updatedAt,
