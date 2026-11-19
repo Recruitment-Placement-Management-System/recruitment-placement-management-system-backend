@@ -10,6 +10,17 @@ const envSchema = z.object({
 
   MONGODB_URI: z.string().min(1, "MONGODB_URI is required"),
 
+  AWS_ACCESS_KEY_ID: z.preprocess(
+    (value) => value === "" ? undefined : value,
+    z.string().trim().min(1).optional(),
+  ),
+  AWS_SECRET_ACCESS_KEY: z.preprocess(
+    (value) => value === "" ? undefined : value,
+    z.string().trim().min(1).optional(),
+  ),
+  AWS_REGION: z.string().min(1, "AWS_REGION is required"),
+  AWS_S3_BUCKET: z.string().min(1, "AWS_S3_BUCKET is required"),
+
   JWT_ACCESS_SECRET: z
     .string()
     .min(1, "JWT_ACCESS_SECRET is required"),
@@ -26,7 +37,15 @@ const envSchema = z.object({
     .string()
     .min(1, "SMTP_APP_PASSWORD is required"),
   
-})
+}).superRefine((values, context) => {
+  if (Boolean(values.AWS_ACCESS_KEY_ID) !== Boolean(values.AWS_SECRET_ACCESS_KEY)) {
+    context.addIssue({
+      code: "custom",
+      message: "AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be provided together",
+      path: [values.AWS_ACCESS_KEY_ID ? "AWS_SECRET_ACCESS_KEY" : "AWS_ACCESS_KEY_ID"],
+    });
+  }
+});
 
 const parsedEnv = envSchema.safeParse(process.env);
 
