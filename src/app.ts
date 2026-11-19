@@ -13,6 +13,12 @@ import { createAdminRouter } from './presentation/admin/routes/admin.routes.js'
 import { createCandidateProfileRouter } from './presentation/candidate-profile/routes/candidate-profile.routes.js'
 import { authDependencies, adminDependencies } from './DI/container.js'
 import { candidateProfileDependencies } from './DI/candidate-profile.container.js'
+import { createRecruiterProfileRouter } from './presentation/recruiter-profile/routes/recruiter-profile.routes.js'
+import { recruiterProfileDependencies } from './DI/recruiter-profile.container.js'
+import { createRecruiterCompanyRouter } from './presentation/recruiter-company/routes/recruiter-company.routes.js'
+import { recruiterCompanyDependencies } from './DI/recruiter-company.container.js'
+import { createRecruiterVerificationRouter } from './presentation/recruiter-verification/routes/recruiter-verification.routes.js'
+import { recruiterVerificationDependencies } from './DI/recruiter-verification.container.js'
 
 const app = express()
 
@@ -28,6 +34,9 @@ app.use(pinoHttp({logger}))
 app.use('/api/auth', createAuthRouter(authDependencies))
 app.use('/api/admin', createAdminRouter(adminDependencies))
 app.use('/api/candidate/profile', createCandidateProfileRouter(candidateProfileDependencies))
+app.use('/api/recruiter/profile',createRecruiterProfileRouter(recruiterProfileDependencies))
+app.use('/api/recruiter/company', createRecruiterCompanyRouter(recruiterCompanyDependencies))
+app.use('/api/recruiter/verification', createRecruiterVerificationRouter(recruiterVerificationDependencies))
 
 
 app.use(notFoundMiddleware);
