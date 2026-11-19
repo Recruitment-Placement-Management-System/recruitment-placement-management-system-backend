@@ -9,6 +9,11 @@ export class MongoCompanyRepository extends MongoBaseRepository<Company, import(
     super(CompanyModel, CompanyMapper.toDomain, CompanyMapper.toPersistence, (company) => ({ $set: CompanyMapper.toPersistence(company) }), "Company not found");
   }
 
+  async findById(id: string): Promise<Company | null> {
+    const company = await CompanyModel.findById(id).exec();
+    return company ? CompanyMapper.toDomain(company) : null;
+  }
+
   async findByName(name: string): Promise<Company | null> {
     const company = await CompanyModel.findOne({
       name:name.trim(),
