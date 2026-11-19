@@ -10,15 +10,12 @@ export class MongoVerificationRequestRepository extends MongoBaseRepository<Veri
     super(VerificationRequestModel, VerificationRequestMapper.toDomain, VerificationRequestMapper.toPersistence, (request) => ({ $set: VerificationRequestMapper.toPersistence(request) }), "Verification request not found");
   }
 
-  async findByEntity(entityId: string, entityType: "recruiter"): Promise<VerificationRequest | null> {
-    const request = await VerificationRequestModel.findOne({
+  async findAllByEntity(entityId: string, entityType: "recruiter"): Promise<VerificationRequest[]> {
+    const requests = await VerificationRequestModel.find({
       entityId,
       entityType,
-    }).exec()
-
-    if(!request)return null ;
-
-    return VerificationRequestMapper.toDomain(request);
+    }).sort({ submittedAt: -1, createdAt: -1 }).exec();
+    return requests.map(VerificationRequestMapper.toDomain);
   }
 
 

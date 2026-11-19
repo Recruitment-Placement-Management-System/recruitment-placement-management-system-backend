@@ -2,8 +2,8 @@ import type { VerificationRequest } from "../../../domain/entities/verification-
 import type { IRepository } from "./repository.js";
 
 export interface IVerificationRequestRepository extends IRepository<VerificationRequest> {
-  findByEntity(
+  findAllByEntity(
     entityId: string,
     entityType: "recruiter",
-  ): Promise<VerificationRequest | null>;
+  ): Promise<VerificationRequest[]>;
 }
