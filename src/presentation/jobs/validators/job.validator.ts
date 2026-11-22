@@ -76,6 +76,7 @@ const queryFields = {
   workMode: workModeSchema.optional(),
   experienceLevel: experienceLevelSchema.optional(),
   skill: z.string().trim().min(1).max(80).optional(),
+  sortBy: z.enum(["latest", "deadline", "salary_low_to_high", "salary_high_to_low"]).default("latest"),
 };
 
 export const recruiterJobListQuerySchema = z.object({

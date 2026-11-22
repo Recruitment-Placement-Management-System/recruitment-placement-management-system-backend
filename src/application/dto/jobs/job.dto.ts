@@ -27,6 +27,7 @@ export interface JobQueryOptions {
   experienceLevel?: JobExperienceLevel | undefined;
   skill?: string | undefined;
   status?: JobStatus | undefined;
+  sortBy?: "latest" | "deadline" | "salary_low_to_high" | "salary_high_to_low" | undefined;
 }
 
 export interface JobResponseDto {
