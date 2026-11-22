@@ -19,6 +19,9 @@ import { createRecruiterCompanyRouter } from './presentation/recruiter-company/r
 import { recruiterCompanyDependencies } from './DI/recruiter-company.container.js'
 import { createRecruiterVerificationRouter } from './presentation/recruiter-verification/routes/recruiter-verification.routes.js'
 import { recruiterVerificationDependencies } from './DI/recruiter-verification.container.js'
+import { createRecruiterJobsRouter } from './presentation/jobs/routes/recruiter-jobs.routes.js'
+import { createPublishedJobsRouter } from './presentation/jobs/routes/published-jobs.routes.js'
+import { jobDependencies } from './DI/jobs.container.js'
 
 const app = express()
 
@@ -37,6 +40,8 @@ app.use('/api/candidate/profile', createCandidateProfileRouter(candidateProfileD
 app.use('/api/recruiter/profile',createRecruiterProfileRouter(recruiterProfileDependencies))
 app.use('/api/recruiter/company', createRecruiterCompanyRouter(recruiterCompanyDependencies))
 app.use('/api/recruiter/verification', createRecruiterVerificationRouter(recruiterVerificationDependencies))
+app.use('/api/recruiter/jobs', createRecruiterJobsRouter(jobDependencies))
+app.use('/api/jobs', createPublishedJobsRouter(jobDependencies))
 
 
 app.use(notFoundMiddleware);
