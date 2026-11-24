@@ -28,6 +28,8 @@ import { candidateJobDependencies } from './DI/candidate-jobs.container.js'
 import { candidateApplicationDependencies, recruiterApplicationDependencies } from './DI/applications.container.js'
 import { createCandidateApplicationsRouter } from './presentation/applications/routes/candidate-applications.routes.js'
 import { createRecruiterApplicationsRouter } from './presentation/applications/routes/recruiter-applications.routes.js'
+import { createCandidateDashboardRouter } from './presentation/candidate-dashboard/routes/candidate-dashboard.routes.js'
+import { candidateDashboardDependencies } from './DI/candidate-dashboard.container.js'
 
 const app = express()
 
@@ -44,18 +46,18 @@ app.use('/api/auth', createAuthRouter(authDependencies))
 app.use('/api/admin', createAdminRouter(adminDependencies))
 
 app.use('/api/candidate/profile', createCandidateProfileRouter(candidateProfileDependencies))
-app.use('/api/recruiter/profile',createRecruiterProfileRouter(recruiterProfileDependencies))
+app.use('/api/candidate/dashboard', createCandidateDashboardRouter(candidateDashboardDependencies))
+app.use('/api/candidate/jobs', createCandidateJobsRouter(candidateJobDependencies))
+app.use('/api/candidate/saved-jobs', createCandidateSavedJobsRouter(candidateJobDependencies))
+app.use('/api/candidate/applications', createCandidateApplicationsRouter(candidateApplicationDependencies))
 
+app.use('/api/recruiter/profile',createRecruiterProfileRouter(recruiterProfileDependencies))
 app.use('/api/recruiter/company', createRecruiterCompanyRouter(recruiterCompanyDependencies))
 app.use('/api/recruiter/verification', createRecruiterVerificationRouter(recruiterVerificationDependencies))
 app.use('/api/recruiter/jobs', createRecruiterJobsRouter(jobDependencies))
+app.use('/api/recruiter/applications', createRecruiterApplicationsRouter(recruiterApplicationDependencies))
 
 app.use('/api/jobs', createPublishedJobsRouter(jobDependencies))
-app.use('/api/candidate/jobs', createCandidateJobsRouter(candidateJobDependencies))
-app.use('/api/candidate/saved-jobs', createCandidateSavedJobsRouter(candidateJobDependencies))
-
-app.use('/api/candidate/applications', createCandidateApplicationsRouter(candidateApplicationDependencies))
-app.use('/api/recruiter/applications', createRecruiterApplicationsRouter(recruiterApplicationDependencies))
 
 
 app.use(notFoundMiddleware);

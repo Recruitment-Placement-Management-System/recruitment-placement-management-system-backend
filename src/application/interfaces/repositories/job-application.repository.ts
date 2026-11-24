@@ -2,6 +2,7 @@ import type { JobApplication, JobApplicationStatus } from "../../../domain/entit
 import type { JobApplicationQueryDto, PaginatedJobApplications } from "../../dto/applications/job-application.dto.js";
 
 export interface IJobApplicationRepository {
+  getCandidateDashboardData(candidateId: string, recentLimit: number): Promise<{ total: number; statusCounts: Record<JobApplicationStatus, number>; recent: JobApplication[]; appliedJobIds: string[] }>;
   create(application: JobApplication): Promise<JobApplication>;
   findById(id: string): Promise<JobApplication | null>;
   findByCandidateAndJob(candidateId: string, jobId: string): Promise<JobApplication | null>;
