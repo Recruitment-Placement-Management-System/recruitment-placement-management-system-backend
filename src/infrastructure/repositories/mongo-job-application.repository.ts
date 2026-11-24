@@ -1,4 +1,5 @@
 import type { JobApplicationQueryDto } from "../../application/dto/applications/job-application.dto.js";
+import { Types } from "mongoose";
 import type { IJobApplicationRepository } from "../../application/interfaces/repositories/job-application.repository.js";
 import type { JobApplication, JobApplicationStatus } from "../../domain/entities/job-application.entity.js";
 import { AppError } from "../../application/errors/app-error.js";
@@ -7,6 +8,24 @@ import { JobApplicationModel, type JobApplicationDocument } from "../database/mo
 import { JobApplicationMapper } from "../mappers/job-application.mapper.js";
 
 export class MongoJobApplicationRepository implements IJobApplicationRepository {
+  
+  async getCandidateDashboardData(candidateId: string, recentLimit: number) {
+    const [total, grouped, documents, jobIds] = await Promise.all([
+      JobApplicationModel.countDocuments({ candidateId }).exec(),
+      JobApplicationModel.aggregate<{ _id: JobApplicationStatus; count: number }>([
+        { $match: { candidateId: new Types.ObjectId(candidateId) } },
+        { $group: { _id: "$status", count: { $sum: 1 } } },
+      ]).exec(),
+      JobApplicationModel.find({ candidateId }).sort({ submittedAt: -1 }).limit(recentLimit).exec(),
+      JobApplicationModel.distinct("jobId", { candidateId }).exec(),
+    ]);
+    const statusCounts: Record<JobApplicationStatus, number> = {
+      submitted: 0, under_review: 0, shortlisted: 0, rejected: 0, withdrawn: 0,
+    };
+    for (const row of grouped) statusCounts[row._id] = row.count;
+    return { total, statusCounts, recent: documents.map(JobApplicationMapper.toDomain), appliedJobIds: jobIds.map((id) => id.toString()) };
+  }
+
   async create(application: JobApplication): Promise<JobApplication> {
     try {
       const document = await JobApplicationModel.create(JobApplicationMapper.toPersistence(application));
